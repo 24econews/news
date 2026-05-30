@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(claude-api)",
+      "Bash(python3.11 scheduler/daily_pipeline.py)",
+      "Bash(python3.11 -m pip install anthropic)",
+      "Bash(python3.11 --version)",
+      "Bash(curl https://bootstrap.pypa.io/get-pip.py)",
+      "Bash(python3.11)",
+      "WebSearch",
+      "WebFetch(domain:www.iprofesional.com)",
+      "WebFetch(domain:www.cronista.com)",
+      "WebFetch(domain:servicios.lanacion.com.ar)",
+      "WebFetch(domain:www.infobae.com)",
+      "WebFetch(domain:www.ambito.com)",
+      "WebFetch(domain:www.lanacion.com.ar)",
+      "WebFetch(domain:contenidos.lanacion.com.ar)",
+      "WebFetch(domain:gist.github.com)",
+      "Bash(curl -sI \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml&section=economia\")",
+      "Bash(curl -sI \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/section/economia/?outputType=xml\")",
+      "Bash(curl -sI \"https://www.infobae.com/arc/outboundfeeds/rss/section/economia/\")",
+      "Bash(curl -sL \"https://www.infobae.com/arc/outboundfeeds/rss/\")",
+      "Bash(curl -s \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml&section=economia\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"https://www.infobae.com/arc/outboundfeeds/rss/\")",
+      "Bash(curl -s \"https://www.lanacion.com.ar/economia/\")",
+      "Bash(curl -sI \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/category/economia/?outputType=xml\")",
+      "Bash(curl -sI \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/section//economia/?outputType=xml\")",
+      "Bash(curl -s \"https://www.lanacion.com.ar/arc/outboundfeeds/rss/category/economia/?outputType=xml\")",
+      "Bash(curl -sI \"https://www.infobae.com/arc/outboundfeeds/rss/category/economia/\")",
+      "Bash(curl -sI \"https://www.infobae.com/arc/outboundfeeds/rss/category/economia/?outputType=xml\")",
+      "Bash(curl -s \"https://www.infobae.com/arc/outboundfeeds/rss/category/economia/\")",
+      "Bash(curl -sI \"https://www.ambito.com/rss/pages/economia.xml\")",
+      "Bash(curl -s \"https://www.ambito.com/rss/pages/economia.xml\")",
+      "Bash(python3 -c \"import feedparser; print\\(feedparser.__version__\\); print\\(dir\\(feedparser\\)\\)\")",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"import feedparser; print\\(feedparser.__version__\\); import feedparser.exceptions; print\\([x for x in dir\\(feedparser.exceptions\\) if 'Encoding' in x or 'encoding' in x]\\)\")",
+      "Bash(python3 -c \"import feedparser; print\\(feedparser.__version__\\)\")"
+    ]
+  }
+}

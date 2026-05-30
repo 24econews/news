@@ -1,0 +1,99 @@
+2026-05-29 09:00:07 [INFO] __main__ — === Pipeline started ===
+2026-05-29 09:00:07 [INFO] db.storage — Database ready at economy_digest.db
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching Infobae — https://www.infobae.com/arc/outboundfeeds/rss/category/economia/
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — Infobae: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Infobae: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching La Nacion — https://www.lanacion.com.ar/arc/outboundfeeds/rss/category/economia/?outputType=xml
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — La Nacion: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — La Nacion: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching Clarin — https://www.clarin.com/rss/economia/
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — Clarin: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Clarin: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching Ambito Financiero — https://www.ambito.com/rss/pages/economia.xml
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — Ambito Financiero: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Ambito Financiero: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching El Cronista — https://www.cronista.com/files/rss/news.xml
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — El Cronista: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — El Cronista: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching iProfesional — https://www.iprofesional.com/rss/economia
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — iProfesional: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — iProfesional: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Fetching Perfil — https://www.perfil.com/rss/economia
+2026-05-29 09:00:07 [WARNING] ingestion.rss_fetcher — Perfil: feed parse warning — <urlopen error [Errno 8] nodename nor servname provided, or not known>
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Perfil: 0 articles fetched
+2026-05-29 09:00:07 [INFO] ingestion.rss_fetcher — Total articles fetched: 0
+2026-05-29 09:00:07 [WARNING] __main__ — No articles fetched — aborting pipeline
+2026-05-30 09:00:09 [INFO] __main__ — === Pipeline started ===
+2026-05-30 09:00:09 [INFO] db.storage — Database ready at economy_digest.db
+2026-05-30 09:00:09 [INFO] ingestion.rss_fetcher — Fetching Infobae — https://www.infobae.com/arc/outboundfeeds/rss/category/economia/
+2026-05-30 09:00:11 [INFO] ingestion.rss_fetcher — Infobae: 100 articles fetched
+2026-05-30 09:00:11 [INFO] ingestion.rss_fetcher — Fetching La Nacion — https://www.lanacion.com.ar/arc/outboundfeeds/rss/category/economia/?outputType=xml
+2026-05-30 09:00:13 [INFO] ingestion.rss_fetcher — La Nacion: 94 articles fetched
+2026-05-30 09:00:13 [INFO] ingestion.rss_fetcher — Fetching Clarin — https://www.clarin.com/rss/economia/
+2026-05-30 09:00:13 [INFO] ingestion.rss_fetcher — Clarin: 10 articles fetched
+2026-05-30 09:00:13 [INFO] ingestion.rss_fetcher — Fetching Ambito Financiero — https://www.ambito.com/rss/pages/economia.xml
+2026-05-30 09:00:14 [WARNING] ingestion.rss_fetcher — Ambito Financiero: feed parse warning — document declared as us-ascii, but parsed as utf-8
+2026-05-30 09:00:14 [INFO] ingestion.rss_fetcher — Ambito Financiero: 20 articles fetched
+2026-05-30 09:00:14 [INFO] ingestion.rss_fetcher — Fetching El Cronista — https://www.cronista.com/files/rss/news.xml
+2026-05-30 09:00:16 [INFO] ingestion.rss_fetcher — El Cronista: 100 articles fetched
+2026-05-30 09:00:16 [INFO] ingestion.rss_fetcher — Fetching iProfesional — https://www.iprofesional.com/rss/economia
+2026-05-30 09:00:16 [INFO] ingestion.rss_fetcher — iProfesional: 28 articles fetched
+2026-05-30 09:00:16 [INFO] ingestion.rss_fetcher — Fetching Perfil — https://www.perfil.com/rss/economia
+2026-05-30 09:00:17 [INFO] ingestion.rss_fetcher — Perfil: 70 articles fetched
+2026-05-30 09:00:17 [INFO] ingestion.rss_fetcher — Total articles fetched: 422
+2026-05-30 09:00:17 [INFO] __main__ — New articles (not yet in DB): 258/422
+2026-05-30 09:00:18 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 09:00:22 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 09:00:23 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 09:00:25 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:17:12 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:24 [INFO] anthropic._base_client — Retrying request to /v1/messages in 0.410808 seconds
+2026-05-30 19:19:27 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:29 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:31 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:34 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:36 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:39 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:41 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:43 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:45 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:48 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:53 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:55 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:57 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:19:59 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:01 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:03 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:05 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:08 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:10 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:12 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:14 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:17 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:19 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:21 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:24 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:25 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:27 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:30 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:31 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:36 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:37 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:39 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:41 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:42 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:46 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:47 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:49 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:51 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:53 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:55 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:20:58 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:00 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:03 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:09 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:11 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:14 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:16 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:18 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-05-30 19:21:20 [INFO] httpx — HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
