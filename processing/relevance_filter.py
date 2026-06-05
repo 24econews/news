@@ -30,8 +30,10 @@ Responde ÚNICAMENTE con un objeto JSON con dos campos:
 Ejemplo: {"relevant": true, "reason": "Trata sobre la variación del dólar oficial y su impacto en las importaciones"}"""
 
 
-def is_economically_relevant(article: Article, client: anthropic.Anthropic) -> bool:
-    """Ask Claude whether a single article is economically relevant to Argentina."""
+def is_economically_relevant(
+    article: Article, client: anthropic.Anthropic, system_prompt: str = SYSTEM_PROMPT
+) -> bool:
+    """Ask Claude whether a single article is economically relevant."""
     text = f"Título: {article.title}\n\nResumen: {article.summary or article.content or '(sin contenido)'}"
 
     try:
@@ -41,7 +43,7 @@ def is_economically_relevant(article: Article, client: anthropic.Anthropic) -> b
             system=[
                 {
                     "type": "text",
-                    "text": SYSTEM_PROMPT,
+                    "text": system_prompt,
                     "cache_control": {"type": "ephemeral"},
                 }
             ],
@@ -53,15 +55,16 @@ def is_economically_relevant(article: Article, client: anthropic.Anthropic) -> b
         return relevant
     except (json.JSONDecodeError, IndexError, Exception) as exc:
         logger.warning(f"Relevance check failed for '{article.title[:60]}': {exc}")
-        # Default to including the article when the check fails
         return True
 
 
-def filter_articles(articles: List[Article], client: anthropic.Anthropic) -> List[Article]:
+def filter_articles(
+    articles: List[Article], client: anthropic.Anthropic, system_prompt: str = SYSTEM_PROMPT
+) -> List[Article]:
     """Return only the economically relevant articles from the list."""
     relevant = []
     for article in articles:
-        article.is_relevant = is_economically_relevant(article, client)
+        article.is_relevant = is_economically_relevant(article, client, system_prompt)
         if article.is_relevant:
             relevant.append(article)
 

@@ -22,13 +22,15 @@ El resumen debe:
 No incluyas frases introductorias como "Este artículo trata sobre..." — ve directo al contenido."""
 
 
-def summarize_article(article: Article, client: anthropic.Anthropic) -> str:
+def summarize_article(
+    article: Article, client: anthropic.Anthropic, system_prompt: str = SYSTEM_PROMPT
+) -> str:
     """Generate a 3–5 sentence economic summary of an article via Claude."""
     body = article.content or article.summary or ""
     if not body.strip():
         body = "(Solo se dispone del título)"
 
-    prompt = f"Título: {article.title}\n\nContenido:\n{body[:3000]}"  # Truncate very long content
+    prompt = f"Título: {article.title}\n\nContenido:\n{body[:3000]}"
 
     try:
         response = client.messages.create(
@@ -37,7 +39,7 @@ def summarize_article(article: Article, client: anthropic.Anthropic) -> str:
             system=[
                 {
                     "type": "text",
-                    "text": SYSTEM_PROMPT,
+                    "text": system_prompt,
                     "cache_control": {"type": "ephemeral"},
                 }
             ],
@@ -51,9 +53,11 @@ def summarize_article(article: Article, client: anthropic.Anthropic) -> str:
         return article.summary or ""
 
 
-def summarize_articles(articles: List[Article], client: anthropic.Anthropic) -> List[Article]:
+def summarize_articles(
+    articles: List[Article], client: anthropic.Anthropic, system_prompt: str = SYSTEM_PROMPT
+) -> List[Article]:
     """Summarize all articles in-place and return the list."""
     for i, article in enumerate(articles, 1):
         logger.info(f"Summarizing {i}/{len(articles)}: {article.title[:60]}")
-        article.full_summary = summarize_article(article, client)
+        article.full_summary = summarize_article(article, client, system_prompt)
     return articles

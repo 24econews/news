@@ -1,3 +1,13 @@
+country:
+  slug: argentina
+  name: Argentina
+  digest_header: "Digest Económico Argentina"
+
+digest:
+  max_articles: 10
+  output_dir: digests/
+  db_path: economy_digest.db
+
 rss_feeds:
   - name: Infobae
     url: https://www.infobae.com/arc/outboundfeeds/rss/category/economia/
