@@ -1,4 +1,5 @@
 anthropic>=0.40.0
+certifi>=2024.2.2
 feedparser>=6.0.11
 pyyaml>=6.0.2
 python-dotenv>=1.0.1
