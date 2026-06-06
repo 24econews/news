@@ -2,7 +2,7 @@ rss_feeds:
   - name: Folha de S.Paulo
     url: https://feeds.folha.uol.com.br/mercado/rss091.xml
   - name: Valor Econômico
-    url: https://valor.globo.com/rss.xml
+    url: http://pox.globo.com/rss/valor
   - name: Brazil Journal
     url: https://braziljournal.com/negocios/feed/
   - name: InfoMoney
