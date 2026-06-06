@@ -37,6 +37,9 @@ jobs:
           python scheduler/daily_pipeline.py --country argentina
           echo "::endgroup::"
 
+- name: Debug - show load_config function
+        run: sed -n '78,88p' scheduler/daily_pipeline.py
+
       - name: Run Brazil pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
