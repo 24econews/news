@@ -23,12 +23,13 @@ Un artículo es relevante si trata sobre alguno de estos temas:
 - Empleo y salarios en Argentina
 - Medidas del FMI o acuerdos internacionales que afecten a Argentina
 
-Se te dará una lista numerada de artículos. Responde ÚNICAMENTE con los números de los artículos relevantes, separados por comas.
-Si ninguno es relevante, responde con "ninguno".
+Se te dará una lista numerada de artículos (pueden estar en cualquier idioma). Responde ÚNICAMENTE con los números de los artículos relevantes, separados por comas.
+Si ninguno es relevante, responde ÚNICAMENTE con la palabra "ninguno".
+Responde siempre en este formato, independientemente del idioma de los artículos.
 
 Ejemplo de respuesta: "1,3,5,7"
 Otro ejemplo: "2,4"
-Otro ejemplo: "ninguno"
+Ejemplo cuando ninguno es relevante: "ninguno"
 """
 
 
@@ -67,7 +68,8 @@ def _filter_batch(
         )
         raw = response.content[0].text.strip().lower()
 
-        if raw == "ninguno":
+        _NONE_RESPONSES = {"ninguno", "nenhum", "none", "0", ""}
+        if raw in _NONE_RESPONSES:
             return set()
 
         relevant_indices: Set[int] = set()
