@@ -40,6 +40,25 @@ function renderSummary(summary: string) {
   return <p className="text-slate-600 text-sm leading-relaxed">{summary}</p>
 }
 
+function NarrativeContent({ rawContent }: { rawContent: string }) {
+  const paragraphs = rawContent
+    .split('\n\n')
+    .map((p) => p.trim())
+    .filter((p) => p && !p.startsWith('#') && !p.startsWith('*Análisis'))
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
+      <div className="prose prose-slate max-w-none">
+        {paragraphs.map((p, i) => (
+          <p key={i} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
+            {p}
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function DigestViewer({
   esDigest,
   enDigest,
@@ -169,39 +188,43 @@ export default function DigestViewer({
           </div>
         )}
 
-        {/* Articles */}
-        <div className="space-y-4">
-          {digest.articles.map((article, i) => (
-            <article
-              key={i}
-              className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-semibold text-slate-900 hover:text-blue-600 transition-colors leading-snug"
-                >
-                  {article.title}
-                </a>
-                <span
-                  className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${sourceBadgeClass(article.source)}`}
-                >
-                  {article.source}
-                </span>
-              </div>
+        {/* Articles or narrative content */}
+        {digest.articles.length > 0 ? (
+          <div className="space-y-4">
+            {digest.articles.map((article, i) => (
+              <article
+                key={i}
+                className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base font-semibold text-slate-900 hover:text-blue-600 transition-colors leading-snug"
+                  >
+                    {article.title}
+                  </a>
+                  <span
+                    className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${sourceBadgeClass(article.source)}`}
+                  >
+                    {article.source}
+                  </span>
+                </div>
 
-              {renderSummary(article.summary)}
+                {renderSummary(article.summary)}
 
-              {article.publishedAt && (
-                <p className="mt-3 text-xs text-slate-400">
-                  Publicado: {article.publishedAt}
-                </p>
-              )}
-            </article>
-          ))}
-        </div>
+                {article.publishedAt && (
+                  <p className="mt-3 text-xs text-slate-400">
+                    Publicado: {article.publishedAt}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <NarrativeContent rawContent={digest.rawContent} />
+        )}
       </div>
     </div>
   )

@@ -37,6 +37,7 @@ export interface DigestMeta {
 
 export interface DigestContent extends DigestMeta {
   articles: Article[]
+  rawContent: string
 }
 
 export async function getCountryDigests(country: string): Promise<DigestMeta[]> {
@@ -76,7 +77,7 @@ export async function getDigest(
 
   const meta = parseDigestMetadata(content, date, country)
   const articles = parseArticles(content)
-  return { ...meta, articles }
+  return { ...meta, articles, rawContent: content }
 }
 
 export async function searchDigests(
