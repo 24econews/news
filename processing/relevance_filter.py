@@ -68,6 +68,12 @@ def _filter_batch(
         )
         raw = response.content[0].text.strip().lower()
 
+        # Always log raw response for the first batch so pipeline issues are visible.
+        if batch_start == 0:
+            logger.info(f"[RELEVANCE DEBUG] First batch raw API response: {raw!r}")
+        else:
+            logger.debug(f"[RELEVANCE DEBUG] Batch {batch_start} raw API response: {raw!r}")
+
         _NONE_RESPONSES = {"ninguno", "nenhum", "none", "0", ""}
         if raw in _NONE_RESPONSES:
             return set()
@@ -82,6 +88,9 @@ def _filter_batch(
                     relevant_indices.add(batch_start + pos)
                 else:
                     logger.warning(f"Batch response contained out-of-range index {token} (batch size {len(batch)})")
+
+        if not relevant_indices and not any(c.isdigit() for c in raw):
+            logger.warning(f"Batch [{batch_start}]: response contained no digits — model may be responding in prose. Raw: {raw!r}")
 
         logger.debug(f"Batch [{batch_start}:{batch_start+len(batch)}]: {len(relevant_indices)}/{len(batch)} relevant")
         return relevant_indices

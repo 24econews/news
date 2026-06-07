@@ -34,22 +34,28 @@ logger = logging.getLogger(__name__)
 # Country-specific prompts and config routing
 # ---------------------------------------------------------------------------
 
-_BRAZIL_RELEVANCE_PROMPT = """Você é um analista econômico especializado no Brasil. Sua tarefa é determinar se um artigo jornalístico é relevante do ponto de vista econômico para o Brasil.
+_BRAZIL_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
 
-Um artigo é relevante se tratar de algum dos seguintes temas:
-- Macroeconomia brasileira (inflação, PIB, dívida, reservas do Banco Central)
-- Mercados financeiros (real, câmbio, Ibovespa, bonds, commodities)
-- Política econômica do governo brasileiro (orçamento, impostos, subsídios)
-- Comércio exterior e importações/exportações
-- Empresas e indústrias com impacto econômico significativo
-- Emprego e salários no Brasil
-- Medidas do FMI ou acordos internacionais que afetem o Brasil
+An article is relevant if it covers any of these topics related to Brazil:
+- Brazilian macroeconomics (inflation, GDP, debt, central bank reserves)
+- Financial markets (BRL/real exchange rate, Ibovespa, bonds, commodities)
+- Brazilian government economic policy (budget, taxes, subsidies)
+- Foreign trade, imports or exports
+- Companies or industries with significant economic impact in Brazil
+- Employment and wages in Brazil
+- IMF measures or international agreements affecting Brazil
 
-Responda APENAS com um objeto JSON com dois campos:
-- "relevant": boolean (true se for relevante, false se não for)
-- "reason": string curta em português explicando por quê
+You will receive a numbered list of articles. They may be in any language.
 
-Exemplo: {"relevant": true, "reason": "Trata sobre a variação do real e seu impacto nas importações"}"""
+RESPOND ONLY WITH COMMA-SEPARATED NUMBERS. NOTHING ELSE.
+- If articles 1, 3, and 7 are relevant: respond exactly with:  1,3,7
+- If only article 2 is relevant: respond exactly with:  2
+- If none are relevant: respond exactly with:  none
+
+DO NOT write any words, explanations, translations, or punctuation other than digits and commas.
+DO NOT say "Os artigos relevantes são" or anything like that.
+DO NOT respond in Portuguese or any language — output only digits and commas.
+"""
 
 COUNTRY_SETTINGS: dict = {
     "argentina": {
