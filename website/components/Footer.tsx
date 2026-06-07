@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-white font-bold text-base hover:text-blue-400 transition-colors">
-              <span className="text-blue-400">Econo</span>Digest
+              24EcoNews
             </Link>
             <span className="text-slate-600">·</span>
             <span>Global Economic Intelligence</span>
@@ -18,7 +18,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-slate-800 text-xs text-center text-slate-500">
-          Powered by AI | Data from leading media sources
+          24EcoNews — Global Economic Intelligence | Updated Daily
         </div>
       </div>
     </footer>

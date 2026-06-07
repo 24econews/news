@@ -74,7 +74,27 @@ Articles:
     )
     narrative = response.content[0].text.strip()
 
-    return f"# {title} — {date_str}\n\n*{byline} | {date_str}*\n\n{narrative}"
+    headline = _generate_headline(narrative, client)
+    return f"> TITLE: {headline}\n\n# {title} — {date_str}\n\n*{byline} | {date_str}*\n\n{narrative}"
+
+
+def _generate_headline(narrative: str, client: anthropic.Anthropic) -> str:
+    """Generate a short Bloomberg/NYT-style English headline for the narrative."""
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=50,
+        messages=[{
+            "role": "user",
+            "content": (
+                "Based on this economic narrative, write a single compelling headline in English "
+                "(max 12 words) that would make a sophisticated investor want to read it. "
+                "Think NYT or Bloomberg headline style. Be specific — reference the key economic "
+                "theme, not generic. Return ONLY the headline, nothing else.\n\n"
+                + narrative
+            ),
+        }],
+    )
+    return response.content[0].text.strip()
 
 
 def _format_articles(articles: List[Article]) -> str:

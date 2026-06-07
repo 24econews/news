@@ -18,17 +18,16 @@ export const countries: Country[] = [
   },
   {
     slug: 'brazil',
-    name: 'Brasil',
+    name: 'Brazil',
     flag: '🇧🇷',
     language: 'pt',
     active: true,
-    sources: ['Folha de S.Paulo', 'Valor Econômico', 'InfoMoney', 'Exame'],
+    sources: ['Folha de S.Paulo', 'Valor Econômico', 'InfoMoney'],
   },
-  { slug: 'mexico', name: 'México', flag: '🇲🇽', language: 'es', active: false, sources: [] },
+  { slug: 'uruguay', name: 'Uruguay', flag: '🇺🇾', language: 'es', active: false, sources: [] },
+  { slug: 'paraguay', name: 'Paraguay', flag: '🇵🇾', language: 'es', active: false, sources: [] },
   { slug: 'chile', name: 'Chile', flag: '🇨🇱', language: 'es', active: false, sources: [] },
-  { slug: 'usa', name: 'United States', flag: '🇺🇸', language: 'en', active: false, sources: [] },
-  { slug: 'france', name: 'France', flag: '🇫🇷', language: 'fr', active: false, sources: [] },
-  { slug: 'germany', name: 'Germany', flag: '🇩🇪', language: 'de', active: false, sources: [] },
+  { slug: 'bolivia', name: 'Bolivia', flag: '🇧🇴', language: 'es', active: false, sources: [] },
 ]
 
 export function getCountry(slug: string): Country | undefined {

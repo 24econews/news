@@ -66,13 +66,14 @@ export async function getCountryDigests(country: string): Promise<DigestMeta[]> 
   )
 }
 
+// Try English version first; fall back to original-language file.
 export async function getDigest(
   country: string,
-  date: string,
-  lang: 'es' | 'en' = 'es'
+  date: string
 ): Promise<DigestContent | null> {
-  const filename = lang === 'en' ? `digest_${date}.en.md` : `digest_${date}.md`
-  const content = await fetchText(`${RAW_BASE}/${digestDir(country)}/${filename}`)
+  const dir = digestDir(country)
+  const enContent = await fetchText(`${RAW_BASE}/${dir}/digest_${date}.en.md`)
+  const content = enContent ?? await fetchText(`${RAW_BASE}/${dir}/digest_${date}.md`)
   if (!content) return null
 
   const meta = parseDigestMetadata(content, date, country)
@@ -92,7 +93,6 @@ export async function searchDigests(
   for (const c of targets) {
     const digests = await getCountryDigests(c)
     for (const digest of digests) {
-      // fetchText hits Next.js's fetch cache — content already fetched by getCountryDigests
       const content = await fetchText(`${RAW_BASE}/${digestDir(c)}/digest_${digest.date}.md`)
       if (!content) continue
 
@@ -116,16 +116,16 @@ export function parseDigestMetadata(
   date: string,
   country: string
 ): DigestMeta {
-  const titleMatch = content.match(/^# (.+)$/m)
-  const title = titleMatch ? titleMatch[1] : `Digest ${date}`
+  const titleLineMatch = content.match(/^> TITLE: (.+)$/m)
+  const title = titleLineMatch ? titleLineMatch[1].trim() : `Economic Digest — ${date}`
 
-  const countMatch = content.match(/\*(\d+) artículos/)
+  const countMatch = content.match(/\*(\d+)\s+(?:artículos|artigos|articles)/)
   const articleCount = countMatch ? parseInt(countMatch[1]) : 0
 
   const sources: string[] = []
-  const fuentes = content.match(/## Fuentes([\s\S]*?)(?=\n---|\n## [^F])/)
-  if (fuentes) {
-    for (const m of fuentes[1].matchAll(/\[([^\]]+)\]\(#/g)) {
+  const sourcesSection = content.match(/## (?:Fuentes|Fontes|Sources)([\s\S]*?)(?=\n---|\n## [^F])/)
+  if (sourcesSection) {
+    for (const m of sourcesSection[1].matchAll(/\[([^\]]+)\]\(#/g)) {
       sources.push(m[1])
     }
   }
@@ -139,18 +139,16 @@ export function parseDigestMetadata(
 function parseArticles(content: string): Article[] {
   const articles: Article[] = []
 
-  // Split by H2 headings — first part is preamble, skip it
   const sections = content.split('\n## ')
 
   for (const section of sections) {
-    if (!section.trim() || section.startsWith('Fuentes')) continue
+    if (!section.trim() || /^(?:Fuentes|Fontes|Sources)/.test(section)) continue
 
     const firstNewline = section.indexOf('\n')
     if (firstNewline === -1) continue
     const source = section.slice(0, firstNewline).trim()
     const sectionBody = section.slice(firstNewline + 1)
 
-    // Split by H3 article headers
     const articleParts = sectionBody.split('\n### ')
 
     for (let i = 1; i < articleParts.length; i++) {
@@ -166,11 +164,11 @@ function parseArticles(content: string): Article[] {
       const url = titleMatch[2]
       const body = part.slice(nl + 1).trim()
 
-      const pubMatch = body.match(/\*Publicado: ([^*]+)\*/)
+      const pubMatch = body.match(/\*(?:Publicado|Published|Publicação): ([^*]+)\*/)
       const publishedAt = pubMatch ? pubMatch[1].trim() : ''
 
       const summary = body
-        .replace(/\*Publicado:[^*]+\*/g, '')
+        .replace(/\*(?:Publicado|Published|Publicação):[^*]+\*/g, '')
         .replace(/^---+\s*$/gm, '')
         .trim()
 
@@ -181,10 +179,10 @@ function parseArticles(content: string): Article[] {
   return articles
 }
 
-export function formatDate(dateStr: string, locale: 'es' | 'en' = 'es'): string {
+export function formatDate(dateStr: string): string {
   const [year, month, day] = dateStr.split('-').map(Number)
   const d = new Date(year, month - 1, day)
-  return d.toLocaleDateString(locale === 'es' ? 'es-AR' : 'en-US', {
+  return d.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

@@ -21,10 +21,10 @@ export async function generateMetadata({
   params: Promise<{ country: string; date: string }>
 }): Promise<Metadata> {
   const { country, date } = await params
-  const digest = await getDigest(country, date, 'es')
+  const digest = await getDigest(country, date)
   if (!digest) return {}
   return {
-    title: `${digest.title} | EconoDigest`,
+    title: `${digest.title} | 24EcoNews`,
     description: digest.firstHeadline,
   }
 }
@@ -39,15 +39,12 @@ export default async function DigestPage({
   const countryInfo = getCountry(countrySlug)
   if (!countryInfo || !countryInfo.active) notFound()
 
-  const esDigest = await getDigest(countrySlug, date, 'es')
-  if (!esDigest) notFound()
-
-  const enDigest = await getDigest(countrySlug, date, 'en')
+  const digest = await getDigest(countrySlug, date)
+  if (!digest) notFound()
 
   return (
     <DigestViewer
-      esDigest={esDigest}
-      enDigest={enDigest}
+      digest={digest}
       country={countrySlug}
       countryName={countryInfo.name}
       countryFlag={countryInfo.flag}

@@ -49,7 +49,7 @@ export default async function SearchPage({
               type="text"
               name="q"
               defaultValue={q}
-              placeholder="Search keywords... (e.g. inflación, dólar, FMI)"
+              placeholder="Search keywords... (e.g. Milei, Lula, Petrobras)"
               autoFocus
               className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
@@ -114,9 +114,6 @@ export default async function SearchPage({
                           >
                             {formatDate(result.date)}
                           </time>
-                          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs">
-                            {result.articleCount} artículos
-                          </span>
                         </div>
                         <span className="text-xs text-slate-400 font-medium">
                           {result.matchCount} match{result.matchCount !== 1 ? 'es' : ''}
@@ -154,7 +151,7 @@ export default async function SearchPage({
           <div className="text-5xl mb-4">📰</div>
           <p className="text-slate-500">Enter keywords to search across all digests</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {['inflación', 'dólar', 'FMI', 'reservas', 'Milei', 'bonos'].map((term) => (
+            {['Milei', 'Lula', 'BCRA', 'Ibovespa', 'Petrobras', 'default'].map((term) => (
               <Link
                 key={term}
                 href={`/search?q=${encodeURIComponent(term)}`}
