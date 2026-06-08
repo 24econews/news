@@ -1,0 +1,19 @@
+country:
+  slug: chile
+  name: Chile
+  digest_header: "Chile: El Pulso Económico"
+
+digest:
+  max_articles: 10
+  output_dir: digests/chile/
+  db_path: economy_chile.db
+
+rss_feeds:
+  - name: Diario Financiero
+    url: https://www.df.cl/noticias/site/list/port/rss.xml
+  - name: La Tercera
+    url: https://www.latercera.com/rss/
+  - name: La Nación
+    url: https://www.lanacion.cl/feed/
+  - name: SOFOFA
+    url: https://www.sofofa.cl/rss/

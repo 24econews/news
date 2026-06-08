@@ -43,6 +43,13 @@ jobs:
           cp config_brazil.yaml scheduler/config_brazil.yaml
           python scheduler/daily_pipeline.py --country brazil
 
+      - name: Run Chile pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cp config_chile.yaml scheduler/config_chile.yaml
+          python scheduler/daily_pipeline.py --country chile
+
       - name: Commit and push new digests
         run: |
           git config user.name "github-actions[bot]"

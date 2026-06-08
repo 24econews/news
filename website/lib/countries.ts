@@ -26,7 +26,14 @@ export const countries: Country[] = [
   },
   { slug: 'uruguay', name: 'Uruguay', flag: '🇺🇾', language: 'es', active: false, sources: [] },
   { slug: 'paraguay', name: 'Paraguay', flag: '🇵🇾', language: 'es', active: false, sources: [] },
-  { slug: 'chile', name: 'Chile', flag: '🇨🇱', language: 'es', active: false, sources: [] },
+  {
+    slug: 'chile',
+    name: 'Chile',
+    flag: '🇨🇱',
+    language: 'es',
+    active: true,
+    sources: ['Diario Financiero', 'La Tercera', 'La Nación'],
+  },
   { slug: 'bolivia', name: 'Bolivia', flag: '🇧🇴', language: 'es', active: false, sources: [] },
 ]
 

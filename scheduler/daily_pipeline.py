@@ -34,6 +34,29 @@ logger = logging.getLogger(__name__)
 # Country-specific prompts and config routing
 # ---------------------------------------------------------------------------
 
+_CHILE_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
+
+An article is relevant if it covers any of these topics related to Chile:
+- Chilean macroeconomics (inflation, GDP, CLP peso, Central Bank of Chile)
+- Financial markets (CLP exchange rate, IPSA index, copper prices, bonds)
+- Chilean government economic policy (budget, taxes, subsidies, reforms)
+- Foreign trade, imports or exports involving Chile
+- Companies or industries with significant economic impact in Chile
+- Employment and wages in Chile
+- IMF measures or international agreements affecting Chile
+- Mining, especially copper (Chile's main export)
+
+You will receive a numbered list of articles. They may be in any language.
+
+RESPOND ONLY WITH COMMA-SEPARATED NUMBERS. NOTHING ELSE.
+- If articles 1, 3, and 7 are relevant: respond exactly with:  1,3,7
+- If only article 2 is relevant: respond exactly with:  2
+- If none are relevant: respond exactly with:  none
+
+DO NOT write any words, explanations, translations, or punctuation other than digits and commas.
+DO NOT respond in Spanish or any language — output only digits and commas.
+"""
+
 _BRAZIL_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
 
 An article is relevant if it covers any of these topics related to Brazil:
@@ -67,6 +90,11 @@ COUNTRY_SETTINGS: dict = {
         "config_file": "config_brazil.yaml",
         "relevance_prompt": _BRAZIL_RELEVANCE_PROMPT,
         "source_language": "Portuguese",
+    },
+    "chile": {
+        "config_file": "config_chile.yaml",
+        "relevance_prompt": _CHILE_RELEVANCE_PROMPT,
+        "source_language": "Spanish",
     },
 }
 
@@ -204,7 +232,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--country",
         default="argentina",
-        choices=list(COUNTRY_SETTINGS),
+        choices=sorted(COUNTRY_SETTINGS),
         help="Country to run the pipeline for (default: argentina)",
     )
     args = parser.parse_args()
