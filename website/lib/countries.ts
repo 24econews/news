@@ -32,7 +32,14 @@ export const countries: Country[] = [
     active: true,
     sources: ['El País Uruguay', 'El Observador', 'La Diaria'],
   },
-  { slug: 'paraguay', name: 'Paraguay', flag: '🇵🇾', language: 'es', active: false, sources: [] },
+  {
+    slug: 'paraguay',
+    name: 'Paraguay',
+    flag: '🇵🇾',
+    language: 'es',
+    active: true,
+    sources: ['ABC Color', 'La Nación Paraguay', 'Última Hora'],
+  },
   {
     slug: 'chile',
     name: 'Chile',
@@ -41,7 +48,14 @@ export const countries: Country[] = [
     active: true,
     sources: ['Diario Financiero', 'La Tercera', 'La Nación'],
   },
-  { slug: 'bolivia', name: 'Bolivia', flag: '🇧🇴', language: 'es', active: false, sources: [] },
+  {
+    slug: 'bolivia',
+    name: 'Bolivia',
+    flag: '🇧🇴',
+    language: 'es',
+    active: true,
+    sources: ['El Deber', 'Opinión Bolivia', 'Los Tiempos'],
+  },
 ]
 
 export function getCountry(slug: string): Country | undefined {

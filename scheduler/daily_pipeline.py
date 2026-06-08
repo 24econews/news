@@ -34,6 +34,53 @@ logger = logging.getLogger(__name__)
 # Country-specific prompts and config routing
 # ---------------------------------------------------------------------------
 
+_PARAGUAY_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
+
+An article is relevant if it covers any of these topics related to Paraguay:
+- Paraguayan macroeconomics (inflation, GDP, guaraní currency, Central Bank of Paraguay, BCP)
+- Financial markets (PYG/USD exchange rate, bonds, commodities)
+- Paraguayan government economic policy (budget, taxes, subsidies, reforms)
+- Foreign trade, imports or exports involving Paraguay
+- Companies or industries with significant economic impact in Paraguay
+- Employment and wages in Paraguay
+- IMF measures or international agreements affecting Paraguay
+- Key sectors: soy, beef, electricity (Itaipú/Yacyretá), re-export trade, maquila industry
+
+You will receive a numbered list of articles. They may be in any language.
+
+RESPOND ONLY WITH COMMA-SEPARATED NUMBERS. NOTHING ELSE.
+- If articles 1, 3, and 7 are relevant: respond exactly with:  1,3,7
+- If only article 2 is relevant: respond exactly with:  2
+- If none are relevant: respond exactly with:  none
+
+DO NOT write any words, explanations, translations, or punctuation other than digits and commas.
+DO NOT respond in Spanish or any language — output only digits and commas.
+"""
+
+_BOLIVIA_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
+
+An article is relevant if it covers any of these topics related to Bolivia:
+- Bolivian macroeconomics (inflation, GDP, boliviano currency, Central Bank of Bolivia, BCB)
+- Financial markets (BOB/USD exchange rate, bonds, commodities)
+- Bolivian government economic policy (budget, subsidies, nationalization, reforms)
+- Foreign trade, imports or exports involving Bolivia
+- Companies or industries with significant economic impact in Bolivia
+- Employment and wages in Bolivia
+- IMF measures or international agreements affecting Bolivia
+- Key sectors: gas/hydrocarbons, lithium, mining (tin, silver, zinc), coca, agriculture
+- Fuel crisis or dollar shortage (chronic structural issues)
+
+You will receive a numbered list of articles. They may be in any language.
+
+RESPOND ONLY WITH COMMA-SEPARATED NUMBERS. NOTHING ELSE.
+- If articles 1, 3, and 7 are relevant: respond exactly with:  1,3,7
+- If only article 2 is relevant: respond exactly with:  2
+- If none are relevant: respond exactly with:  none
+
+DO NOT write any words, explanations, translations, or punctuation other than digits and commas.
+DO NOT respond in Spanish or any language — output only digits and commas.
+"""
+
 _URUGUAY_RELEVANCE_PROMPT = """You are an economic relevance classifier. Your ONLY job is to output numbers.
 
 An article is relevant if it covers any of these topics related to Uruguay:
@@ -122,6 +169,16 @@ COUNTRY_SETTINGS: dict = {
     "uruguay": {
         "config_file": "config_uruguay.yaml",
         "relevance_prompt": _URUGUAY_RELEVANCE_PROMPT,
+        "source_language": "Spanish",
+    },
+    "paraguay": {
+        "config_file": "config_paraguay.yaml",
+        "relevance_prompt": _PARAGUAY_RELEVANCE_PROMPT,
+        "source_language": "Spanish",
+    },
+    "bolivia": {
+        "config_file": "config_bolivia.yaml",
+        "relevance_prompt": _BOLIVIA_RELEVANCE_PROMPT,
         "source_language": "Spanish",
     },
 }

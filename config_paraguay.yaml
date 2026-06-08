@@ -1,0 +1,25 @@
+country:
+  slug: paraguay
+  name: Paraguay
+  digest_header: "Paraguay: El Pulso Económico"
+
+digest:
+  max_articles: 10
+  output_dir: digests/paraguay/
+  db_path: economy_paraguay.db
+
+rss_feeds:
+  # Direct feed
+  - name: Hoy
+    url: https://www.hoy.com.py/rss/
+
+  # ABC Color, La Nación PY and Última Hora don't expose working RSS directly;
+  # using Google News site: search to aggregate their economic coverage
+  - name: ABC Color
+    url: https://news.google.com/rss/search?q=economia+site:abc.com.py&hl=es-419&gl=PY&ceid=PY:es-419
+
+  - name: La Nación Paraguay
+    url: https://news.google.com/rss/search?q=economia+site:lanacion.com.py&hl=es-419&gl=PY&ceid=PY:es-419
+
+  - name: Última Hora
+    url: https://news.google.com/rss/search?q=economia+site:ultimahora.com&hl=es-419&gl=PY&ceid=PY:es-419

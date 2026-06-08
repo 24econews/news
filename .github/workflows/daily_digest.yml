@@ -57,6 +57,20 @@ jobs:
           cp config_uruguay.yaml scheduler/config_uruguay.yaml
           python scheduler/daily_pipeline.py --country uruguay
 
+      - name: Run Paraguay pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cp config_paraguay.yaml scheduler/config_paraguay.yaml
+          python scheduler/daily_pipeline.py --country paraguay
+
+      - name: Run Bolivia pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cp config_bolivia.yaml scheduler/config_bolivia.yaml
+          python scheduler/daily_pipeline.py --country bolivia
+
       - name: Commit and push new digests
         run: |
           git config user.name "github-actions[bot]"

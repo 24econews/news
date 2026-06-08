@@ -1,0 +1,25 @@
+country:
+  slug: bolivia
+  name: Bolivia
+  digest_header: "Bolivia: El Pulso Económico"
+
+digest:
+  max_articles: 10
+  output_dir: digests/bolivia/
+  db_path: economy_bolivia.db
+
+rss_feeds:
+  # Direct feed
+  - name: Opinión Bolivia
+    url: https://www.opinion.com.bo/rss/
+
+  # El Deber direct RSS has malformed XML; Los Tiempos has no RSS;
+  # using Google News site: search to aggregate their coverage
+  - name: El Deber
+    url: https://news.google.com/rss/search?q=economia+site:eldeber.com.bo&hl=es-419&gl=BO&ceid=BO:es-419
+
+  - name: Los Tiempos
+    url: https://news.google.com/rss/search?q=economia+site:lostiempos.com&hl=es-419&gl=BO&ceid=BO:es-419
+
+  - name: Bolivia Economía
+    url: https://news.google.com/rss/search?q=economia+bolivia+finanzas&hl=es-419&gl=BO&ceid=BO:es-419
