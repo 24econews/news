@@ -58,18 +58,18 @@ export default async function HomePage() {
 
       {/* ── HERO / LEAD STORY ── */}
       {leadEntry && (
-        <section className="bg-[#0f172a] text-white">
+        <section className="bg-white border-b border-slate-200">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
             <div className="flex items-center gap-8 md:gap-16">
               {/* Left: text */}
               <div className="flex-1 min-w-0">
-                <span className="text-xs font-bold uppercase tracking-widest text-red-500 mb-4 block">
+                <span className="text-xs font-bold uppercase tracking-widest text-red-600 mb-4 block">
                   {leadEntry.country.flag}&nbsp; {leadEntry.country.name}
                 </span>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-slate-900 mb-4">
                   {leadEntry.content.title}
                 </h1>
-                <p className="text-slate-400 text-sm mb-8">
+                <p className="text-slate-500 text-sm mb-8">
                   {formatDate(leadEntry.content.date)}
                 </p>
                 <Link
@@ -132,7 +132,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── COVERAGE MAP ── */}
-      <section id="countries" className="border-t border-slate-100 bg-slate-50">
+      <section id="countries" className="border-t border-slate-100 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
           <h2 className="text-2xl font-bold text-slate-900 mb-8">Our Coverage</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -180,9 +180,9 @@ export default async function HomePage() {
       </section>
 
       {/* ── ABOUT STRIP ── */}
-      <section className="bg-[#0f172a] text-white">
+      <section className="bg-slate-50 border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-          <p className="text-slate-300 text-sm leading-relaxed max-w-2xl">
+          <p className="text-slate-600 text-sm leading-relaxed max-w-2xl">
             24EcoNews delivers daily AI-powered economic intelligence on emerging markets.
             Independent. Data-driven. Updated every morning.
           </p>

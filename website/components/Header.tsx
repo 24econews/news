@@ -20,13 +20,13 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-[#0f172a] text-white shadow-lg">
+    <header className="bg-white border-b border-red-600 shadow-none">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold tracking-tight shrink-0 hover:text-slate-300 transition-colors"
+          className="text-xl font-bold tracking-tight shrink-0 text-red-600 hover:text-red-700 transition-colors"
         >
           24EcoNews
         </Link>
@@ -39,8 +39,8 @@ export default function Header() {
               href={href}
               className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                 isActive(href)
-                  ? 'text-white border-red-600'
-                  : 'text-slate-300 hover:text-white border-transparent'
+                  ? 'text-slate-900 border-red-600'
+                  : 'text-slate-700 hover:text-slate-900 border-transparent'
               }`}
             >
               {label}
@@ -55,7 +55,7 @@ export default function Header() {
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden p-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+          className="md:hidden p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -71,7 +71,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-slate-800 border-t border-slate-700">
+        <div className="md:hidden bg-white border-t border-slate-200">
           {navLinks.map(({ label, href }) => (
             <Link
               key={href}
@@ -79,8 +79,8 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               className={`block px-6 py-3 text-sm font-medium transition-colors ${
                 isActive(href)
-                  ? 'text-white border-l-2 border-red-600 bg-slate-700'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  ? 'text-slate-900 border-l-2 border-red-600 bg-slate-50'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
               {label}
