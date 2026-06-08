@@ -66,19 +66,27 @@ export async function getCountryDigests(country: string): Promise<DigestMeta[]> 
   )
 }
 
-// Try English version first; fall back to original-language file.
+// Use .en.md for display content, but always use .md as authoritative metadata source
+// (the .md files are guaranteed to have > TITLE: lines after backfill; .en.md cache may lag)
 export async function getDigest(
   country: string,
   date: string
 ): Promise<DigestContent | null> {
   const dir = digestDir(country)
-  const enContent = await fetchText(`${RAW_BASE}/${dir}/digest_${date}.en.md`)
-  const content = enContent ?? await fetchText(`${RAW_BASE}/${dir}/digest_${date}.md`)
-  if (!content) return null
 
-  const meta = parseDigestMetadata(content, date, country)
-  const articles = parseArticles(content)
-  return { ...meta, articles, rawContent: content }
+  const [enContent, mdContent] = await Promise.all([
+    fetchText(`${RAW_BASE}/${dir}/digest_${date}.en.md`),
+    fetchText(`${RAW_BASE}/${dir}/digest_${date}.md`),
+  ])
+
+  const displayContent = enContent ?? mdContent
+  if (!displayContent) return null
+
+  // .md is authoritative for metadata (title always present after backfill)
+  const meta = parseDigestMetadata(mdContent ?? displayContent, date, country)
+  const articles = parseArticles(displayContent)
+  console.log(`[getDigest] ${country}/${date} title="${meta.title}"`)
+  return { ...meta, articles, rawContent: displayContent }
 }
 
 export async function searchDigests(

@@ -44,10 +44,14 @@ export default async function HomePage() {
     )
   )
 
-  const allWithContent: Array<{ country: Country; content: DigestContent }> = activeCountries
+  const allWithContent: Array<{ country: Country; content: DigestContent; title: string }> = activeCountries
     .flatMap((c) => {
       const content = latestContentBySlug[c.slug]
-      return content ? [{ country: c, content }] : []
+      if (!content) return []
+      // Prefer title from getCountryDigests() (.md source) — confirmed working
+      const title = latestMetaBySlug[c.slug]?.title || content.title || ''
+      console.log(`[homepage] ${c.slug} title="${title}"`)
+      return [{ country: c, content, title }]
     })
     .sort((a, b) => b.content.date.localeCompare(a.content.date))
 
@@ -67,7 +71,7 @@ export default async function HomePage() {
                   {leadEntry.country.flag}&nbsp; {leadEntry.country.name}
                 </span>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-slate-900 mb-4">
-                  {leadEntry.content.title || 'Read Today\'s Analysis'}
+                  {leadEntry.title || 'Read Today\'s Analysis'}
                 </h1>
                 <p className="text-slate-500 text-sm mb-8">
                   {formatDate(leadEntry.content.date)}
@@ -98,9 +102,7 @@ export default async function HomePage() {
           Today&apos;s Briefings
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {activeCountries.map((c) => {
-            const content = latestContentBySlug[c.slug]
-            if (!content) return null
+          {allWithContent.map(({ country: c, content, title }) => {
             const teaser = extractTeaser(content.rawContent)
             return (
               <div
@@ -111,7 +113,7 @@ export default async function HomePage() {
                   {c.flag}&nbsp; {c.name}
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 leading-snug mb-2 line-clamp-2">
-                  {content.title || 'Read Today\'s Analysis'}
+                  {title || 'Read Today\'s Analysis'}
                 </h3>
                 <p className="text-xs text-slate-500 mb-4">{formatDate(content.date)}</p>
                 {teaser && (
