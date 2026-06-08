@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(SCRIPT_DIR))
 from db.storage import init_db, get_known_urls, save_articles
 from generation.digest_builder import build_narrative_digest
 from ingestion.rss_fetcher import fetch_all_feeds
+from processing.image_fetcher import fetch_hero_image
 from processing.relevance_filter import filter_articles
 from processing.translator import translate_digest
 
@@ -256,6 +257,27 @@ def run_pipeline(country: str = "argentina") -> None:
     # --- Build narrative digest ---
     logger.info(f"Generating narrative digest from {len(relevant)} relevant articles…")
     digest_md = build_narrative_digest(relevant, today, country=country, client=client)
+
+    # --- Fetch hero image ---
+    title_match = next(
+        (line[len("> TITLE:"):].strip() for line in digest_md.splitlines()[:5] if line.startswith("> TITLE:")),
+        None,
+    )
+    if title_match:
+        img = fetch_hero_image(title_match, country)
+        if img:
+            image_block = (
+                f"> IMAGE_URL: {img['url']}\n"
+                f"> IMAGE_THUMB: {img['thumb']}\n"
+                f"> IMAGE_CREDIT: {img['photographer']}\n"
+                f"> IMAGE_CREDIT_URL: {img['photographer_url']}\n"
+            )
+            # Insert image block before the > TITLE: line
+            digest_md = image_block + digest_md
+            logger.info(f"Hero image attached: {img['url']}")
+        else:
+            logger.info("No hero image found — continuing without one")
+
     path = publish_digest_file(digest_md, today, output_dir)
 
     # --- Translate to English ---

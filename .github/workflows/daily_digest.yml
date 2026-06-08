@@ -33,12 +33,14 @@ jobs:
       - name: Run Argentina pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           python scheduler/daily_pipeline.py --country argentina
 
       - name: Run Brazil pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           cp config_brazil.yaml scheduler/config_brazil.yaml
           python scheduler/daily_pipeline.py --country brazil
@@ -46,6 +48,7 @@ jobs:
       - name: Run Chile pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           cp config_chile.yaml scheduler/config_chile.yaml
           python scheduler/daily_pipeline.py --country chile
@@ -53,6 +56,7 @@ jobs:
       - name: Run Uruguay pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           cp config_uruguay.yaml scheduler/config_uruguay.yaml
           python scheduler/daily_pipeline.py --country uruguay
@@ -60,6 +64,7 @@ jobs:
       - name: Run Paraguay pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           cp config_paraguay.yaml scheduler/config_paraguay.yaml
           python scheduler/daily_pipeline.py --country paraguay
@@ -67,6 +72,7 @@ jobs:
       - name: Run Bolivia pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: |
           cp config_bolivia.yaml scheduler/config_bolivia.yaml
           python scheduler/daily_pipeline.py --country bolivia

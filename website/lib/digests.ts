@@ -33,6 +33,10 @@ export interface DigestMeta {
   articleCount: number
   sources: string[]
   firstHeadline: string
+  image_url?: string
+  image_thumb?: string
+  image_credit?: string
+  image_credit_url?: string
 }
 
 export interface DigestContent extends DigestMeta {
@@ -128,6 +132,11 @@ export function parseDigestMetadata(
   const title = titleLineMatch ? titleLineMatch[1].trim() : ''
   if (!titleLineMatch) console.log(`[digests] no TITLE line found in ${country}/${date}`)
 
+  const imageUrlMatch = content.match(/^> IMAGE_URL: (.+)$/m)
+  const imageThumbMatch = content.match(/^> IMAGE_THUMB: (.+)$/m)
+  const imageCreditMatch = content.match(/^> IMAGE_CREDIT: (.+)$/m)
+  const imageCreditUrlMatch = content.match(/^> IMAGE_CREDIT_URL: (.+)$/m)
+
   const countMatch = content.match(/\*(\d+)\s+(?:artículos|artigos|articles)/)
   const articleCount = countMatch ? parseInt(countMatch[1]) : 0
 
@@ -142,7 +151,18 @@ export function parseDigestMetadata(
   const headlineMatch = content.match(/### \[([^\]]+)\]/)
   const firstHeadline = headlineMatch ? headlineMatch[1] : ''
 
-  return { date, country, title, articleCount, sources, firstHeadline }
+  return {
+    date,
+    country,
+    title,
+    articleCount,
+    sources,
+    firstHeadline,
+    image_url: imageUrlMatch?.[1].trim(),
+    image_thumb: imageThumbMatch?.[1].trim(),
+    image_credit: imageCreditMatch?.[1].trim(),
+    image_credit_url: imageCreditUrlMatch?.[1].trim(),
+  }
 }
 
 function parseArticles(content: string): Article[] {
