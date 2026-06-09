@@ -11,22 +11,129 @@ interface Props {
   countryFlag: string
 }
 
+interface CrossLink {
+  event: string
+  summary: string
+  links: Array<{ text: string; url: string }>
+}
+
+function parseRelatedCoverage(rawContent: string): {
+  mainContent: string
+  items: CrossLink[]
+} {
+  const markers = ['\n---\n## Related Coverage', '\n## Related Coverage']
+  let sepIdx = -1
+  let markerLen = 0
+
+  for (const marker of markers) {
+    const idx = rawContent.indexOf(marker)
+    if (idx !== -1) {
+      sepIdx = idx
+      markerLen = marker.length
+      break
+    }
+  }
+
+  if (sepIdx === -1) return { mainContent: rawContent, items: [] }
+
+  const mainContent = rawContent.slice(0, sepIdx)
+  const section = rawContent.slice(sepIdx + markerLen).trim()
+  const items: CrossLink[] = []
+
+  for (const block of section.split(/\n\n+/)) {
+    const lines = block.split('\n').filter(Boolean)
+    if (!lines.length) continue
+    const eventMatch = lines[0].match(/^\*\*(.+)\*\*$/)
+    if (!eventMatch) continue
+
+    const summaryLines: string[] = []
+    const links: Array<{ text: string; url: string }> = []
+
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].startsWith('→ See also:')) {
+        const rest = lines[i].slice('→ See also:'.length).trim()
+        const dashIdx = rest.lastIndexOf(' — ')
+        if (dashIdx !== -1) {
+          links.push({ text: rest.slice(0, dashIdx), url: rest.slice(dashIdx + 3) })
+        } else {
+          links.push({ text: rest, url: '' })
+        }
+      } else {
+        summaryLines.push(lines[i])
+      }
+    }
+
+    items.push({ event: eventMatch[1], summary: summaryLines.join(' '), links })
+  }
+
+  return { mainContent, items }
+}
+
+function RelatedCoverage({ items }: { items: CrossLink[] }) {
+  if (!items.length) return null
+
+  return (
+    <div
+      className="mt-8 rounded-xl border border-slate-200 overflow-hidden"
+      style={{ borderLeftWidth: '4px', borderLeftColor: '#dc2626' }}
+    >
+      <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          Related Coverage
+        </h2>
+      </div>
+      <div className="divide-y divide-slate-100">
+        {items.map((item, i) => (
+          <div key={i} className="bg-slate-50 px-5 py-4">
+            <p className="font-semibold text-slate-900 text-sm mb-1">{item.event}</p>
+            {item.summary && (
+              <p className="text-sm text-slate-600 mb-2 leading-relaxed">{item.summary}</p>
+            )}
+            <div className="space-y-1">
+              {item.links.map((link, j) => (
+                <div key={j} className="text-sm flex items-start gap-1">
+                  <span className="text-slate-400 shrink-0">→</span>
+                  {link.url ? (
+                    <Link
+                      href={link.url}
+                      className="text-red-600 hover:text-red-700 font-medium leading-snug"
+                    >
+                      {link.text}
+                    </Link>
+                  ) : (
+                    <span className="text-slate-600 leading-snug">{link.text}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function NarrativeContent({ rawContent }: { rawContent: string }) {
-  const paragraphs = rawContent
+  const { mainContent, items } = parseRelatedCoverage(rawContent)
+
+  const paragraphs = mainContent
     .split('\n\n')
     .map((p) => p.trim())
     .filter((p) => p && !p.startsWith('#') && !p.startsWith('>') && !/^\*[^*]+\*$/.test(p))
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
-      <div className="prose prose-slate max-w-none">
-        {paragraphs.map((p, i) => (
-          <p key={i} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
-            {p}
-          </p>
-        ))}
+    <>
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
+        <div className="prose prose-slate max-w-none">
+          {paragraphs.map((p, i) => (
+            <p key={i} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
+              {p}
+            </p>
+          ))}
+        </div>
       </div>
-    </div>
+      <RelatedCoverage items={items} />
+    </>
   )
 }
 
