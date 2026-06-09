@@ -90,7 +90,7 @@ export async function getDigest(
   const meta = parseDigestMetadata(mdContent ?? displayContent, date, country)
   const articles = parseArticles(displayContent)
   const rawContent = displayContent.replace(
-    /^> (?:IMAGE_URL|IMAGE_THUMB|IMAGE_CREDIT|IMAGE_CREDIT_URL|TITLE): .*\n?/gm,
+    /^(?:> )?(?:IMAGE_URL|IMAGE_THUMB|IMAGE_CREDIT|IMAGE_CREDIT_URL|TITLE):.*\n?/gm,
     ''
   )
   console.log(`[getDigest] ${country}/${date} title="${meta.title}"`)
