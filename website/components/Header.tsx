@@ -12,11 +12,13 @@ export default function Header() {
     { label: 'Home', href: '/' },
     { label: 'Countries', href: '/#countries' },
     { label: 'Search', href: '/search' },
+    { label: 'About', href: '/about' },
   ]
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/'
-    return pathname.startsWith(href.replace('/#countries', ''))
+    if (href.startsWith('/#')) return pathname === '/'
+    return pathname.startsWith(href)
   }
 
   return (
