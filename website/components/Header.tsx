@@ -13,6 +13,7 @@ export default function Header() {
     { label: 'Countries', href: '/#countries' },
     { label: 'Search', href: '/search' },
     { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ]
 
   function isActive(href: string) {
