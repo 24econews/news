@@ -51,18 +51,34 @@ def build_narrative_digest(
 
     articles_text = _format_articles(articles)
 
-    user_prompt = f"""Based on the following news articles from {country_name} today, write a single cohesive economic and business narrative of 600-800 words.
+    user_prompt = f"""Based on the following news articles from {country_name} today, produce an economic and business report in two parts.
 
-Requirements:
+---
+PART 1 — MAIN NARRATIVE (600-800 words, required):
 - Start with a strong lede that captures the dominant economic theme of the day
 - Weave the most important stories together into flowing, connected prose
 - Integrate market data (exchange rates, indices, risk indicators) naturally
 - Group related themes: fiscal policy, markets, trade, industry, etc.
+- When significant corporate stories exist (earnings results, M&A deals, IPOs, major restructurings), weave them naturally into the narrative. If the company trades internationally, note it explicitly — e.g., "Petrobras, whose ADRs trade on the NYSE, reported quarterly earnings that..."
 - End with a forward-looking paragraph on what to watch next
-- Write in {language}: Spanish for Argentina, Portuguese for Brazil
+- Write in {language}
 - Do not list articles separately — this must read as one unified piece
 - Attribute key facts to their sources naturally within the text
 
+---
+PART 2 — CORPORATE WATCH (optional section, include only if warranted):
+After the narrative, if the articles contain significant corporate news — M&A deals, earnings that materially beat or missed expectations, IPOs, major restructurings, or notable executive appointments/departures at major companies — add a "## Corporate Watch" section.
+
+Rules for this section:
+- Maximum 3 items
+- Each item: bold company name with exchange and ticker in parentheses, then an em dash, then 1-2 sentences maximum
+- Tone: Bloomberg Markets brief — factual, precise, no editorializing
+- Make global significance explicit in every item (international listings, cross-border deals, commodity exposure, etc.)
+- Format: **Company Name (NYSE: XYZ)** — Sentence one. Sentence two if needed.
+- Write the content in {language}, but keep "## Corporate Watch" as the section header in English
+- If there are no significant corporate stories today, omit this entire section — do NOT force it
+
+---
 Articles:
 {articles_text}"""
 

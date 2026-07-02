@@ -46,6 +46,10 @@ An article is relevant if it covers any of these topics related to Paraguay:
 - Employment and wages in Paraguay
 - IMF measures or international agreements affecting Paraguay
 - Key sectors: soy, beef, electricity (Itaipú/Yacyretá), re-export trade, maquila industry
+- Corporate news: fusiones y adquisiciones (M&A), resultados financieros trimestrales/anuales, quiebras o reestructuraciones, OPV/IPO, cambios ejecutivos relevantes
+- Major Paraguayan companies and any company from Paraguay listed on NYSE, NASDAQ, or major European exchanges
+- M&A deals where foreign companies acquire Paraguayan ones or Paraguayan companies expand abroad
+- When in doubt about a corporate story's significance, include it
 
 You will receive a numbered list of articles. They may be in any language.
 
@@ -70,6 +74,10 @@ An article is relevant if it covers any of these topics related to Bolivia:
 - IMF measures or international agreements affecting Bolivia
 - Key sectors: gas/hydrocarbons, lithium, mining (tin, silver, zinc), coca, agriculture
 - Fuel crisis or dollar shortage (chronic structural issues)
+- Corporate news: M&A deals, quarterly/annual earnings, bankruptcies or restructurings, IPOs, significant executive changes
+- Major Bolivian companies (YPFB, Boliviana de Aviación, mining firms, etc.) and any Bolivian company listed on NYSE, NASDAQ, or major European exchanges
+- M&A deals involving Bolivian companies or foreign acquisitions of Bolivian assets
+- When in doubt about a corporate story's significance, include it
 
 You will receive a numbered list of articles. They may be in any language.
 
@@ -93,6 +101,10 @@ An article is relevant if it covers any of these topics related to Uruguay:
 - Employment and wages in Uruguay
 - IMF measures or international agreements affecting Uruguay
 - Key sectors: agriculture (soy, beef, dairy), technology, tourism, free trade zones
+- Corporate news: fusiones y adquisiciones (M&A), resultados financieros trimestrales/anuales, quiebras o reestructuraciones, OPV/IPO, cambios ejecutivos relevantes
+- Major Uruguayan companies (UPM, Antel, ANCAP, Montes del Plata, etc.) and any Uruguayan company listed on NYSE, NASDAQ, or major European exchanges
+- M&A deals where foreign companies acquire Uruguayan ones or Uruguayan companies expand abroad
+- When in doubt about a corporate story's significance, include it
 
 You will receive a numbered list of articles. They may be in any language.
 
@@ -116,6 +128,10 @@ An article is relevant if it covers any of these topics related to Chile:
 - Employment and wages in Chile
 - IMF measures or international agreements affecting Chile
 - Mining, especially copper (Chile's main export)
+- Corporate news: fusiones y adquisiciones (M&A), resultados financieros trimestrales/anuales, quiebras o reestructuraciones, OPV/IPO, cambios ejecutivos relevantes
+- Major Chilean companies (Cencosud, Falabella, CMPC, Copec, SQM, Antofagasta, LATAM Airlines, Banco Santander Chile, etc.) and any Chilean company listed on NYSE, NASDAQ, or major European exchanges
+- M&A deals where foreign companies acquire Chilean ones or Chilean companies expand abroad
+- When in doubt about a corporate story's significance, include it
 
 You will receive a numbered list of articles. They may be in any language.
 
@@ -138,6 +154,10 @@ An article is relevant if it covers any of these topics related to Brazil:
 - Companies or industries with significant economic impact in Brazil
 - Employment and wages in Brazil
 - IMF measures or international agreements affecting Brazil
+- Corporate news: fusões e aquisições (M&A), resultados financeiros trimestrais/anuais, falências ou reestruturações, IPO, mudanças executivas relevantes
+- Major Brazilian companies (Petrobras, Vale, Ambev, Itaú, Bradesco, BTG Pactual, Embraer, JBS, Grupo Pão de Açúcar, XP Inc., etc.) and any Brazilian company listed on NYSE, NASDAQ, B3, or major European exchanges
+- M&A deals where foreign companies acquire Brazilian ones or Brazilian companies expand abroad
+- When in doubt about a corporate story's significance, include it
 
 You will receive a numbered list of articles. They may be in any language.
 

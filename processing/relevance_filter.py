@@ -19,9 +19,13 @@ Un artículo es relevante si trata sobre alguno de estos temas:
 - Mercados financieros (dólar, bonos, acciones, commodities)
 - Política económica del gobierno argentino (presupuesto, impuestos, subsidios)
 - Comercio exterior e importaciones/exportaciones
-- Empresas e industrias con impacto económico significativo
+- Empresas e industrias con impacto económico significativo en Argentina
 - Empleo y salarios en Argentina
 - Medidas del FMI o acuerdos internacionales que afecten a Argentina
+- Noticias corporativas: fusiones y adquisiciones (M&A), resultados financieros trimestrales/anuales, quiebras o reestructuraciones, OPV/IPO, cambios ejecutivos relevantes
+- Grandes empresas argentinas (YPF, Tenaris, MercadoLibre, Grupo Galicia, Banco Macro, Loma Negra, etc.) y empresas argentinas cotizadas en NYSE, NASDAQ o bolsas europeas
+- Operaciones de M&A donde empresas extranjeras adquieren argentinas o empresas argentinas se expanden al exterior
+En caso de duda sobre si una noticia corporativa tiene relevancia económica significativa, incluirla.
 
 Se te dará una lista numerada de artículos (pueden estar en cualquier idioma). Responde ÚNICAMENTE con los números de los artículos relevantes, separados por comas.
 Si ninguno es relevante, responde ÚNICAMENTE con la palabra "ninguno".
