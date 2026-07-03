@@ -80,6 +80,7 @@ PART 1 — MAIN NARRATIVE (600-800 words, required):
 - Write in {language}
 - Do not list articles separately — this must read as one unified piece
 - Attribute key facts to their sources naturally within the text
+- Do NOT insert any headlines, sub-headlines, or title lines inside the narrative body. The narrative should be flowing prose only, with no # headings, no bold title lines, and no lines that summarize the article before the body begins. Start directly with the first sentence of the narrative.
 
 ---
 PART 2 — CORPORATE WATCH (optional section, include only if warranted):
