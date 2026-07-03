@@ -71,7 +71,19 @@ def build_narrative_digest(
 
 ---
 PART 1 — MAIN NARRATIVE (600-800 words, required):
-- Start with a strong lede that captures the dominant economic theme of the day
+
+Before writing, identify what is most newsworthy TODAY specifically — what has changed, what is surprising, what connects to global trends, or what contradicts expectations. Lead with that angle. Do not default to a standard macro-overview structure every day.
+
+Possible angles (choose the one that fits today's news best):
+- A single dominant story that overshadows everything else
+- A tension or contradiction between two economic forces
+- A surprising data point or market move that needs explaining
+- A corporate or sector story with regional/global implications
+- A policy decision and its likely ripple effects
+- A longer-term trend that today's news crystallizes
+
+Your opening sentence should immediately signal which angle you have chosen. A reader should know within one sentence what makes today's digest different from yesterday's.
+
 - Weave the most important stories together into flowing, connected prose
 - Integrate market data (exchange rates, indices, risk indicators) naturally
 - Group related themes: fiscal policy, markets, trade, industry, etc.
@@ -81,6 +93,7 @@ PART 1 — MAIN NARRATIVE (600-800 words, required):
 - Do not list articles separately — this must read as one unified piece
 - Attribute key facts to their sources naturally within the text
 - Do NOT insert any headlines, sub-headlines, or title lines inside the narrative body. The narrative should be flowing prose only, with no # headings, no bold title lines, and no lines that summarize the article before the body begins. Start directly with the first sentence of the narrative.
+- Do not follow the same paragraph structure every day. Sometimes open with markets, sometimes with a company, sometimes with a political-economic development, sometimes with a data point. The narrative should feel like it was written by a journalist who read today's news and chose the most compelling entry point — not by a system running the same template.
 
 ---
 PART 2 — CORPORATE WATCH (optional section, include only if warranted):
@@ -119,10 +132,16 @@ def _generate_headline(narrative: str, client: anthropic.Anthropic) -> str:
         messages=[{
             "role": "user",
             "content": (
-                "Based on this economic narrative, write a single compelling headline in English "
-                "(max 12 words) that would make a sophisticated investor want to read it. "
-                "Think NYT or Bloomberg headline style. Be specific — reference the key economic "
-                "theme, not generic. Return ONLY the headline, nothing else.\n\n"
+                "Write a headline (max 12 words) that captures the single most important or "
+                "surprising economic development described below. The headline should reflect "
+                "what is genuinely new or different today — not a generic summary of ongoing "
+                "conditions. Vary the style: sometimes a declarative statement, sometimes a "
+                "tension or paradox, sometimes a question, sometimes a single sharp observation. "
+                "Avoid starting every headline with the country name followed by a verb.\n\n"
+                "Review your headline. If it follows the pattern '[Country] + [verb] + [economic "
+                "theme]', rewrite it to be more specific, more surprising, or more vivid. The "
+                "best headlines name something concrete, not a category.\n\n"
+                "Return ONLY the final headline, nothing else.\n\n"
                 + narrative
             ),
         }],
