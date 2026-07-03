@@ -10,21 +10,37 @@ from ingestion.rss_fetcher import Article
 _TITLES = {
     "argentina": "Argentina: El Pulso Económico",
     "brazil": "Brasil: O Pulso Econômico",
+    "chile": "Chile: El Pulso Económico",
+    "uruguay": "Uruguay: El Pulso Económico",
+    "paraguay": "Paraguay: El Pulso Económico",
+    "bolivia": "Bolivia: The Economic Pulse",
 }
 
 _BYLINES = {
     "argentina": "Análisis generado con IA",
     "brazil": "Análise gerada com IA",
+    "chile": "Análisis generado con IA",
+    "uruguay": "Análisis generado con IA",
+    "paraguay": "Análisis generado con IA",
+    "bolivia": "Análisis generado con IA",
 }
 
 _LANGUAGES = {
     "argentina": "Spanish",
     "brazil": "Portuguese",
+    "chile": "Spanish",
+    "uruguay": "Spanish",
+    "paraguay": "Spanish",
+    "bolivia": "Spanish",
 }
 
 _COUNTRY_NAMES = {
     "argentina": "Argentina",
     "brazil": "Brazil",
+    "chile": "Chile",
+    "uruguay": "Uruguay",
+    "paraguay": "Paraguay",
+    "bolivia": "Bolivia",
 }
 
 SYSTEM_PROMPT = (
