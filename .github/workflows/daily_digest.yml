@@ -83,6 +83,23 @@ jobs:
         run: |
           python scheduler/run_all_countries.py --cross-link-only
 
+      - name: Check if Thursday
+        id: check_day
+        run: |
+          if [ "$(date +%u)" = "4" ]; then
+            echo "is_thursday=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_thursday=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Weekly Briefing
+        if: github.event_name == 'schedule' &&
+            steps.check_day.outputs.is_thursday == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python publishing/weekly_briefing.py
+
       - name: Commit and push new digests
         run: |
           git config user.name "github-actions[bot]"
@@ -95,11 +112,19 @@ jobs:
             git push origin main
           fi
 
-      - name: Post to X
-        env:
-          X_API_KEY: ${{ secrets.X_API_KEY }}
-          X_API_SECRET: ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: |
-          python publishing/post_all_countries.py
+      # X (Twitter) posting is paused as of July 2026 — the X API
+      # free tier does not include write/posting credits for this
+      # account, and requires the paid Basic tier (~$100/month) to
+      # post tweets. Re-enable this step once revenue justifies the
+      # cost. See publishing/x_poster.py and publishing/post_all_countries.py
+      # for the (working, tested) implementation — it only needs
+      # valid paid-tier credentials to function.
+
+      # - name: Post to X
+      #   env:
+      #     X_API_KEY: ${{ secrets.X_API_KEY }}
+      #     X_API_SECRET: ${{ secrets.X_API_SECRET }}
+      #     X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+      #     X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+      #   run: |
+      #     python publishing/post_all_countries.py
