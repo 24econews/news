@@ -66,6 +66,10 @@ def send_newsletter(subject: str, body: str, api_key: str) -> dict:
         headers={
             "Authorization": f"Token {api_key}",
             "Content-Type": "application/json",
+            # Required to actually queue a send with status="about_to_send" — Buttondown
+            # returns a sending_requires_confirmation 400 without it, as a safeguard
+            # against accidental sends. See https://buttondown.com/blog/safer-email-api-defaults
+            "X-Buttondown-Live-Dangerously": "true",
         },
         json={
             "subject": subject,
