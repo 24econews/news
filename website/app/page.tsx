@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { countries, getActiveCountries, type Country } from '@/lib/countries'
 import { getCountryDigests, getDigest, formatDate, type DigestContent } from '@/lib/digests'
 import HeroRotator from '@/components/HeroRotator'
+import NewsletterSignup from '@/components/NewsletterSignup'
 
 function extractTeaser(rawContent: string): string {
   const lines = rawContent.replace(/^>\s*TITLE:.*$/m, '').split('\n')
@@ -61,6 +62,21 @@ export default async function HomePage() {
 
       {/* ── HERO / LEAD STORY — randomly rotates between countries on each load ── */}
       {allWithContent.length > 0 && <HeroRotator items={allWithContent} />}
+
+      {/* ── NEWSLETTER SIGNUP ── */}
+      <section className="bg-slate-50 border-y border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 mb-1">
+              Get the Weekly Mercosur Briefing in your inbox
+            </h2>
+            <p className="text-slate-500 text-sm">
+              One email every Thursday. The region&apos;s biggest economic stories, distilled.
+            </p>
+          </div>
+          <NewsletterSignup />
+        </div>
+      </section>
 
       {/* ── TODAY'S BRIEFINGS ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
