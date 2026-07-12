@@ -47,7 +47,16 @@ Before the main title, write a short 1-2 sentence email greeting that feels pers
 - "Six countries, one currency regime abandoned, and a growing sense that the region's reform momentum is outrunning its fiscal cushion. Here's what mattered this week."
 - "From Bolivia's historic currency shift to Chile's fifth straight month of contraction, this week tested the region's resilience. Here's your briefing."
 
-Keep it to 1-2 sentences maximum, no more.
+After the greeting sentences, on their own line, add a signature:
+
+— John Dominguez, Editor
+
+Example format:
+"This week Mercosur delivered a masterclass in contradiction — bold reforms paired with mounting fiscal strain.
+
+— John Dominguez, Editor"
+
+Keep the greeting itself to 1-2 sentences maximum, followed by the signature line, followed by a blank line, then the main title.
 
 # Mercosur Weekly Briefing — Week of {monday_display} to {thursday_display}
 

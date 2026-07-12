@@ -100,13 +100,17 @@ jobs:
         run: |
           python publishing/weekly_briefing.py
 
-      - name: Send Weekly Newsletter via Buttondown
-        if: github.event_name == 'schedule' &&
-            steps.check_day.outputs.is_thursday == 'true'
-        env:
-          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
-        run: |
-          python publishing/buttondown_sender.py
+      # Newsletter sending moved to a separate Friday-morning workflow
+      # (.github/workflows/send_newsletter.yml) so the send happens the
+      # morning after the briefing is generated, not immediately on Thursday.
+
+      # - name: Send Weekly Newsletter via Buttondown
+      #   if: github.event_name == 'schedule' &&
+      #       steps.check_day.outputs.is_thursday == 'true'
+      #   env:
+      #     BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+      #   run: |
+      #     python publishing/buttondown_sender.py
 
       - name: Commit and push new digests
         run: |

@@ -1,0 +1,30 @@
+name: Send Weekly Newsletter
+
+on:
+  schedule:
+    # Friday 9:00 AM ET = 13:00 UTC (adjust for daylight saving
+    # if needed — ET is UTC-5 in winter, UTC-4 in summer/EDT)
+    - cron: '0 13 * * 5'
+  workflow_dispatch:  # allows manual triggering for testing
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Send newsletter for this week's briefing
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: |
+          python publishing/buttondown_sender.py
