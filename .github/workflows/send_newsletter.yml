@@ -26,5 +26,13 @@ jobs:
       - name: Send newsletter for this week's briefing
         env:
           BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        # Only the real scheduled Friday run is a confirmed live send. A manual
+        # workflow_dispatch (used for testing) stays in safe draft mode by
+        # default — this is the exact path that caused an accidental live send
+        # to real subscribers during testing.
         run: |
-          python publishing/buttondown_sender.py
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python publishing/buttondown_sender.py --confirm-live-send
+          else
+            python publishing/buttondown_sender.py --test-send
+          fi
