@@ -32,14 +32,6 @@ export default function ConsentScripts() {
           `}</Script>
         </>
       )}
-      {consent.advertising && (
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7161273140151755"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-      )}
     </>
   )
 }
