@@ -235,7 +235,10 @@ export function extractTeaser(rawContent: string): string {
       continue
     }
     collected += (collected ? ' ' : '') + t
-    const sents = collected.match(/[^.!?]+[.!?]+/g) ?? []
+    // A "." flanked by digits (e.g. "12.5") is a decimal point, not a sentence
+    // boundary — same guard the Python posters apply for "U.S."/"U.K." abbreviations,
+    // just keyed on digit context instead of a fixed set of strings.
+    const sents = collected.match(/(?:[^.!?]|(?<=\d)\.(?=\d))+[.!?]+/g) ?? []
     if (sents.length >= 2) return sents.slice(0, 2).join(' ')
   }
 
