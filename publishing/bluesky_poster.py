@@ -64,10 +64,13 @@ def parse_digest(path: str) -> tuple[str, list[str]]:
     with open(path, encoding="utf-8") as f:
         content = f.read()
 
-    title_match = re.search(r"^>\s*TITLE:\s*(.+)$", content, re.MULTILINE)
+    # DOTALL + a "blank line" lookahead (rather than plain `$`) so a TITLE value
+    # that got word-wrapped onto a following line (no leading "> ") is still
+    # captured in full instead of silently cut at the first newline.
+    title_match = re.search(r"^>\s*TITLE:\s*(.+?)(?=\n\s*\n|\Z)", content, re.MULTILINE | re.DOTALL)
     if not title_match:
         raise ValueError(f"No TITLE metadata found in {path}")
-    title = title_match.group(1).strip()
+    title = re.sub(r"\s+", " ", title_match.group(1)).strip()
 
     heading_match = re.search(r"^#\s+.+$", content, re.MULTILINE)
     if not heading_match:
@@ -91,7 +94,14 @@ def parse_digest(path: str) -> tuple[str, list[str]]:
 
 
 def fit_teaser(sentences: list[str], available_chars: int) -> str:
-    """Take the first 2-3 sentences, truncating cleanly at a sentence boundary if needed."""
+    """Take the first 2-3 sentences, truncating cleanly at a sentence boundary if needed.
+
+    Returns "" if there isn't room for even a truncated excerpt — callers should
+    omit the teaser paragraph entirely in that case rather than force something in.
+    """
+    if available_chars <= 0:
+        return ""
+
     candidate_sentences = sentences[:3]
     full = " ".join(candidate_sentences)
     if len(full) <= available_chars:
@@ -109,21 +119,51 @@ def fit_teaser(sentences: list[str], available_chars: int) -> str:
     return truncated + "…"
 
 
+def post_url(country: str, date_str: str) -> str:
+    return f"{SITE_BASE_URL}/{country}/{date_str}"
+
+
 def compose_post(country: str, date_str: str, title: str, sentences: list[str]) -> str:
+    """Compose the post text. The title is never truncated — if space is tight,
+    the teaser is shortened (down to omitted entirely) instead."""
     flag = FLAGS[country]
-    url = f"{SITE_BASE_URL}/{country}/{date_str}"
+    url = post_url(country, date_str)
     header = f"{flag} {title}"
     footer = f"📰 {url}"
 
-    fixed_len = len(header) + 2 + 2 + len(footer)
-    available = POST_MAX_CHARS - fixed_len
-    if available < 0:
+    header_and_footer = f"{header}\n\n{footer}"
+    if len(header_and_footer) > POST_MAX_CHARS:
         raise ValueError(
-            f"Title + URL alone exceed {POST_MAX_CHARS} characters for {country} {date_str}"
+            f"Title + URL alone are {len(header_and_footer)} chars, exceeding {POST_MAX_CHARS} "
+            f"for {country} {date_str} — cannot compose a post without truncating the title"
         )
 
+    fixed_len = len(header) + 2 + 2 + len(footer)
+    available = POST_MAX_CHARS - fixed_len
     teaser = fit_teaser(sentences, available)
+
+    if not teaser:
+        return header_and_footer
     return f"{header}\n\n{teaser}\n\n{footer}"
+
+
+def build_facets(post_text: str, url: str) -> list[dict]:
+    """Build an AT Protocol facets array marking `url`'s UTF-8 byte range as a link.
+
+    Bluesky does not auto-linkify plain URL text — the byte offsets must be
+    computed from the UTF-8 encoding, not character offsets, since emoji and
+    other multi-byte characters earlier in the text would otherwise throw
+    off the link's position.
+    """
+    idx = post_text.index(url)
+    prefix_bytes = len(post_text[:idx].encode("utf-8"))
+    url_bytes = len(url.encode("utf-8"))
+    return [
+        {
+            "index": {"byteStart": prefix_bytes, "byteEnd": prefix_bytes + url_bytes},
+            "features": [{"$type": "app.bsky.richtext.facet#link", "uri": url}],
+        }
+    ]
 
 
 def create_session(handle: str, app_password: str) -> str:
@@ -145,7 +185,7 @@ def create_session(handle: str, app_password: str) -> str:
     return access_jwt
 
 
-def post_to_bluesky(post_text: str) -> str:
+def post_to_bluesky(post_text: str, url: str) -> str:
     import requests
 
     handle = os.getenv("BLUESKY_HANDLE")
@@ -163,6 +203,7 @@ def post_to_bluesky(post_text: str) -> str:
         raise EnvironmentError(f"Missing required environment variable(s): {', '.join(missing)}")
 
     access_jwt = create_session(handle, app_password)
+    facets = build_facets(post_text, url)
 
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     response = requests.post(
@@ -175,6 +216,7 @@ def post_to_bluesky(post_text: str) -> str:
                 "$type": "app.bsky.feed.post",
                 "text": post_text,
                 "createdAt": created_at,
+                "facets": facets,
             },
         },
         timeout=30,
@@ -196,6 +238,7 @@ def run(country: str, date_str: str, dry_run: bool) -> None:
     path = digest_path(country, date_str)
     title, sentences = parse_digest(path)
     post_text = compose_post(country, date_str, title, sentences)
+    url = post_url(country, date_str)
 
     if len(post_text) > POST_MAX_CHARS:
         raise ValueError(
@@ -203,14 +246,28 @@ def run(country: str, date_str: str, dry_run: bool) -> None:
         )
 
     if dry_run:
+        flag = FLAGS[country]
+        header = f"{flag} {title}"
+        footer = f"📰 {url}"
+        available = POST_MAX_CHARS - (len(header) + 2 + 2 + len(footer))
+        teaser = fit_teaser(sentences, available)
+        spacing = 4 if teaser else 2  # one or two "\n\n" separators
+
         print(f"=== DRY RUN — {country} {date_str} ({len(post_text)} chars) ===")
         print(post_text)
+        print("--- breakdown ---")
+        print(f"title:   {len(title)} chars")
+        print(f"header:  {len(header)} chars (flag + space + title)")
+        print(f"teaser:  {len(teaser)} chars")
+        print(f"footer:  {len(footer)} chars (emoji + space + url)")
+        print(f"spacing: {spacing} chars ({spacing // 2} blank-line separator{'s' if spacing == 4 else ''})")
+        print(f"total:   {len(post_text)} / {POST_MAX_CHARS} chars")
         print("=== END ===")
         return
 
-    post_url = post_to_bluesky(post_text)
-    logger.info(f"[{country}] Posted successfully: {post_url}")
-    print(f"Posted: {post_url}")
+    posted_url = post_to_bluesky(post_text, url)
+    logger.info(f"[{country}] Posted successfully: {posted_url}")
+    print(f"Posted: {posted_url}")
 
 
 if __name__ == "__main__":
