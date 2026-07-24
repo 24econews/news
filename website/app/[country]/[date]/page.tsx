@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getCountry, getActiveCountries } from '@/lib/countries'
-import { getDigest, getCountryDigests } from '@/lib/digests'
+import { getDigest, getCountryDigests, extractTeaser } from '@/lib/digests'
 import DigestViewer from '@/components/DigestViewer'
+
+const BASE = 'https://24econews.com'
 
 export async function generateStaticParams() {
   const params: { country: string; date: string }[] = []
@@ -43,8 +45,27 @@ export default async function DigestPage({
   const digest = await getDigest(countrySlug, date)
   if (!digest) notFound()
 
+  const publishedDate = `${date}T00:00:00.000Z`
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: digest.title || `${countryInfo.name} Economic Digest`,
+    datePublished: publishedDate,
+    dateModified: publishedDate,
+    author: { '@type': 'Organization', name: '24EcoNews' },
+    publisher: { '@type': 'Organization', name: '24EcoNews' },
+    ...(digest.image_url ? { image: digest.image_url } : {}),
+    description: extractTeaser(digest.rawContent) || digest.firstHeadline,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/${countrySlug}/${date}` },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+
       {/* Hero image banner */}
       {digest.image_url && (
         <div

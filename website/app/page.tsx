@@ -1,27 +1,8 @@
 import Link from 'next/link'
 import { countries, getActiveCountries, type Country } from '@/lib/countries'
-import { getCountryDigests, getDigest, formatDate, type DigestContent } from '@/lib/digests'
+import { getCountryDigests, getDigest, formatDate, extractTeaser, type DigestContent } from '@/lib/digests'
 import HeroRotator from '@/components/HeroRotator'
 import NewsletterSignup from '@/components/NewsletterSignup'
-
-function extractTeaser(rawContent: string): string {
-  const lines = rawContent.replace(/^>\s*TITLE:.*$/m, '').split('\n')
-  let collected = ''
-
-  for (const line of lines) {
-    const t = line.trim()
-    if (!t || t.startsWith('#') || t.startsWith('>') || t.startsWith('*') ||
-        t.startsWith('-') || t.startsWith('_') || t.startsWith('|')) {
-      if (collected) break
-      continue
-    }
-    collected += (collected ? ' ' : '') + t
-    const sents = collected.match(/[^.!?]+[.!?]+/g) ?? []
-    if (sents.length >= 2) return sents.slice(0, 2).join(' ')
-  }
-
-  return collected.slice(0, 220)
-}
 
 export default async function HomePage() {
   const activeCountries = getActiveCountries()

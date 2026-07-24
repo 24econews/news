@@ -44,6 +44,13 @@ export interface DigestContent extends DigestMeta {
   rawContent: string
 }
 
+export async function getAllDigests(): Promise<DigestMeta[]> {
+  const results = await Promise.all(getActiveCountries().map((c) => getCountryDigests(c.slug)))
+  return results
+    .flat()
+    .sort((a, b) => b.date.localeCompare(a.date) || a.country.localeCompare(b.country))
+}
+
 export async function getCountryDigests(country: string): Promise<DigestMeta[]> {
   const apiUrl = `${API_BASE}/${digestDir(country)}`
   let files: Array<{ name: string; type: string }>
@@ -210,6 +217,25 @@ function parseArticles(content: string): Article[] {
   }
 
   return articles
+}
+
+export function extractTeaser(rawContent: string): string {
+  const lines = rawContent.replace(/^>\s*TITLE:.*$/m, '').split('\n')
+  let collected = ''
+
+  for (const line of lines) {
+    const t = line.trim()
+    if (!t || t.startsWith('#') || t.startsWith('>') || t.startsWith('*') ||
+        t.startsWith('-') || t.startsWith('_') || t.startsWith('|')) {
+      if (collected) break
+      continue
+    }
+    collected += (collected ? ' ' : '') + t
+    const sents = collected.match(/[^.!?]+[.!?]+/g) ?? []
+    if (sents.length >= 2) return sents.slice(0, 2).join(' ')
+  }
+
+  return collected.slice(0, 220)
 }
 
 export function formatDate(dateStr: string): string {
