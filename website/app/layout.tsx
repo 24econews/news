@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: '24EcoNews — Global Economic Intelligence',
   description:
     'Daily economic narratives from the world\'s most important emerging markets. Coverage of Argentina, Brazil, and the Mercosur region.',
+  other: {
+    'google-adsense-account': 'ca-pub-7161273140151755',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
