@@ -22,6 +22,22 @@ WEEKLY_BRIEFING_DIR = os.path.join(REPO_ROOT, "digests", "weekly")
 
 BUTTONDOWN_EMAILS_URL = "https://api.buttondown.com/v1/emails"
 
+# Static, non-AI-generated block appended to every send. {{ subscribe_form }} is
+# Buttondown's own template tag — passed through literally so Buttondown renders
+# an actual subscribe form in the sent email.
+SUBSCRIBE_BLOCK = (
+    "---\n"
+    "\n"
+    "*Was this briefing forwarded to you? Subscribe to get the Mercosur Weekly "
+    "Briefing in your inbox every Friday.*\n"
+    "\n"
+    "{{ subscribe_form }}"
+)
+
+
+def append_subscribe_block(body: str) -> str:
+    return f"{body.rstrip()}\n\n{SUBSCRIBE_BLOCK}"
+
 
 def thursday_of_week(week_arg: str | None) -> date:
     """--week takes the Monday (YYYY-MM-DD) of the target week; returns that week's Thursday."""
@@ -89,12 +105,14 @@ def run(week_arg: str | None, dry_run: bool) -> None:
 
     logger.info(f"Reading weekly briefing: {path}")
     subject, greeting, body = parse_briefing(path)
+    body = append_subscribe_block(body)
 
     if dry_run:
         print("=== DRY RUN ===")
         print(f"Subject: {subject}")
         print(f"Greeting/preview teaser: {greeting}")
         print(f"\nBody preview (first 200 chars):\n{body[:200]}")
+        print(f"\nBody end (last 500 chars):\n{body[-500:]}")
         print("\nDRY RUN — no email sent")
         return
 
