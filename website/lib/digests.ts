@@ -51,6 +51,21 @@ export async function getAllDigests(): Promise<DigestMeta[]> {
     .sort((a, b) => b.date.localeCompare(a.date) || a.country.localeCompare(b.country))
 }
 
+// The site is English-first (original-language content with EN translations,
+// no language toggle), so the title shown in <title>/<h1> everywhere must come
+// from .en.md when available. .md remains the fallback for the rare case where
+// the EN translation cache lags behind the backfilled source-language file.
+function withEnglishTitle(
+  meta: DigestMeta,
+  enContent: string | null,
+  date: string,
+  country: string
+): DigestMeta {
+  if (!enContent) return meta
+  const enTitle = parseDigestMetadata(enContent, date, country).title
+  return enTitle ? { ...meta, title: enTitle } : meta
+}
+
 export async function getCountryDigests(country: string): Promise<DigestMeta[]> {
   const apiUrl = `${API_BASE}/${digestDir(country)}`
   let files: Array<{ name: string; type: string }>
@@ -70,15 +85,16 @@ export async function getCountryDigests(country: string): Promise<DigestMeta[]> 
   return Promise.all(
     digestFiles.map(async (f) => {
       const date = f.name.replace('digest_', '').replace('.md', '')
-      const content = await fetchText(`${RAW_BASE}/${digestDir(country)}/${f.name}`)
+      const [content, enContent] = await Promise.all([
+        fetchText(`${RAW_BASE}/${digestDir(country)}/${f.name}`),
+        fetchText(`${RAW_BASE}/${digestDir(country)}/digest_${date}.en.md`),
+      ])
       if (!content) return { date, country, title: '', articleCount: 0, sources: [], firstHeadline: '' }
-      return parseDigestMetadata(content, date, country)
+      return withEnglishTitle(parseDigestMetadata(content, date, country), enContent, date, country)
     })
   )
 }
 
-// Use .en.md for display content, but always use .md as authoritative metadata source
-// (the .md files are guaranteed to have > TITLE: lines after backfill; .en.md cache may lag)
 export async function getDigest(
   country: string,
   date: string
@@ -93,8 +109,12 @@ export async function getDigest(
   const displayContent = enContent ?? mdContent
   if (!displayContent) return null
 
-  // .md is authoritative for metadata (title always present after backfill)
-  const meta = parseDigestMetadata(mdContent ?? displayContent, date, country)
+  const meta = withEnglishTitle(
+    parseDigestMetadata(mdContent ?? displayContent, date, country),
+    enContent,
+    date,
+    country
+  )
   const articles = parseArticles(displayContent)
   // TITLE is stripped separately (with a blank-line lookahead) since its value can
   // wrap onto a following line; the other metadata fields are always single-line.
