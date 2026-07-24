@@ -96,10 +96,11 @@ export async function getDigest(
   // .md is authoritative for metadata (title always present after backfill)
   const meta = parseDigestMetadata(mdContent ?? displayContent, date, country)
   const articles = parseArticles(displayContent)
-  const rawContent = displayContent.replace(
-    /^(?:> )?(?:IMAGE_URL|IMAGE_THUMB|IMAGE_CREDIT|IMAGE_CREDIT_URL|TITLE):.*\n?/gm,
-    ''
-  )
+  // TITLE is stripped separately (with a blank-line lookahead) since its value can
+  // wrap onto a following line; the other metadata fields are always single-line.
+  const rawContent = displayContent
+    .replace(/^(?:> )?TITLE:\s*[\s\S]+?(?=\n\s*\n)/m, '')
+    .replace(/^(?:> )?(?:IMAGE_URL|IMAGE_THUMB|IMAGE_CREDIT|IMAGE_CREDIT_URL):.*\n?/gm, '')
   console.log(`[getDigest] ${country}/${date} title="${meta.title}"`)
   return { ...meta, articles, rawContent }
 }
@@ -139,9 +140,12 @@ export function parseDigestMetadata(
   date: string,
   country: string
 ): DigestMeta {
-  const titleLineMatch = content.match(/^> TITLE: (.+)$/m)
-  const title = titleLineMatch ? titleLineMatch[1].trim() : ''
-  if (!titleLineMatch) console.log(`[digests] no TITLE line found in ${country}/${date}`)
+  // Not anchored with `^`/`m`, and no `s` flag — so `$` means "end of string", not
+  // "end of line". That lets the lazy [\s\S]+? span a TITLE value that got
+  // word-wrapped onto a following line, instead of stopping at the first \n.
+  const titleMatch = content.match(/>\s*TITLE:\s*([\s\S]+?)(?:\n\s*\n|$)/)
+  const title = titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : ''
+  if (!titleMatch) console.log(`[digests] no TITLE line found in ${country}/${date}`)
 
   const imageUrlMatch = content.match(/^> IMAGE_URL: (.+)$/m)
   const imageThumbMatch = content.match(/^> IMAGE_THUMB: (.+)$/m)
@@ -220,7 +224,7 @@ function parseArticles(content: string): Article[] {
 }
 
 export function extractTeaser(rawContent: string): string {
-  const lines = rawContent.replace(/^>\s*TITLE:.*$/m, '').split('\n')
+  const lines = rawContent.replace(/^(?:> )?TITLE:\s*[\s\S]+?(?=\n\s*\n)/m, '').split('\n')
   let collected = ''
 
   for (const line of lines) {
