@@ -100,6 +100,24 @@ jobs:
         run: |
           python publishing/weekly_briefing.py
 
+      - name: Check if OpEd day (Mon/Wed/Fri)
+        id: check_oped_day
+        run: |
+          DOW=$(date +%u)
+          if [ "$DOW" = "1" ] || [ "$DOW" = "3" ] || [ "$DOW" = "5" ]; then
+            echo "is_oped_day=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_oped_day=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate OpEd piece
+        if: github.event_name == 'schedule' &&
+            steps.check_oped_day.outputs.is_oped_day == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python generation/oped_builder.py
+
       # Newsletter sending moved to a separate Friday-morning workflow
       # (.github/workflows/send_newsletter.yml) so the send happens the
       # morning after the briefing is generated, not immediately on Thursday.
