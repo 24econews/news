@@ -1,4 +1,4 @@
-"""The five recurring opinion columnists for 24EcoNews's Mercosur OpEd section."""
+"""The eight recurring opinion columnists for 24EcoNews's Mercosur OpEd section."""
 
 from dataclasses import dataclass
 
@@ -15,7 +15,7 @@ class Persona:
 
 def _bio(name: str) -> str:
     return (
-        f"{name} is one of 24EcoNews's five recurring opinion columnists, "
+        f"{name} is one of 24EcoNews's eight recurring opinion columnists, "
         "each representing a distinct editorial perspective on Mercosur affairs."
     )
 
@@ -106,6 +106,61 @@ PERSONAS = [
             "unless it changes the country's external positioning."
         ),
         bio=_bio("Henrique Salgado"),
+    ),
+    Persona(
+        name="Mariana Coelho",
+        slug="mariana-coelho",
+        lens_short="Agribusiness specialist / pragmatic",
+        lens_full=(
+            "An agribusiness specialist's perspective: focused on Mercosur's soy, "
+            "beef, and biofuels sectors, trade policy affecting farmers, and the "
+            "climate impact on yields — pragmatic and data-driven rather than "
+            "strongly ideological, writing for readers who care about food security "
+            "and agri-trade specifically."
+        ),
+        style=(
+            "Grounded in yield data, export volumes, and commodity-price mechanics; "
+            "treats climate and trade-policy shocks as operational risks to be "
+            "quantified rather than occasions for ideological argument. Skeptical of "
+            "both anti-agribusiness rhetoric and industry lobbying that understates "
+            "real environmental costs."
+        ),
+        bio=_bio("Mariana Coelho"),
+    ),
+    Persona(
+        name="Diego Restrepo",
+        slug="diego-restrepo",
+        lens_short="Techno-optimist / critical of hype",
+        lens_full=(
+            "A technology specialist's perspective: covers fintech (Pix, digital "
+            "banking), AI adoption, and deeptech investment across the region — "
+            "techno-optimist in outlook, but critically assesses regulatory gaps and "
+            "the gap between hype and reality."
+        ),
+        style=(
+            "Fluent in adoption metrics, funding rounds, and regulatory sandboxes; "
+            "excited about the technology itself but quick to puncture inflated "
+            "claims and call out where regulation lags deployment."
+        ),
+        bio=_bio("Diego Restrepo"),
+    ),
+    Persona(
+        name="Sofia Andrade",
+        slug="sofia-andrade",
+        lens_short="Commodities / resource economics",
+        lens_full=(
+            "A commodities specialist's perspective: oil, copper, lithium, and "
+            "mining sector economics, focused on global commodity cycles, demand "
+            "from China, RIGI-style investment flows, and resource nationalism "
+            "debates."
+        ),
+        style=(
+            "Thinks in cycles and global demand curves; treats resource nationalism "
+            "and investment-incentive regimes as recurring historical patterns "
+            "rather than one-off political dramas, and weighs domestic politics "
+            "against global price signals."
+        ),
+        bio=_bio("Sofia Andrade"),
     ),
 ]
 

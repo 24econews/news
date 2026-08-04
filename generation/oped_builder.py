@@ -1,9 +1,10 @@
 """Generate the Mercosur OpEd piece for 24EcoNews's Opinion section.
 
-Publishes Monday/Wednesday/Friday, cycling deterministically through five
-recurring opinion columnists (see oped_personas.py). Each piece is grounded
-in recent Brazil and Mercosur-wide daily digests but argued from the
-assigned columnist's stated ideological perspective.
+Publishes Monday/Tuesday/Thursday/Friday (Wednesday skipped), cycling
+deterministically through eight recurring opinion columnists (see
+oped_personas.py). Each piece is grounded in recent Brazil and
+Mercosur-wide daily digests but argued from the assigned columnist's
+stated ideological perspective.
 """
 
 import argparse
@@ -39,11 +40,11 @@ MODEL = "claude-sonnet-4-6"
 
 # Fixed reference point for the rotation — the first Monday the OpEd
 # section is live. Persona assignment is computed from the count of
-# Mon/Wed/Fri publishing days elapsed since this date, so no external
+# Mon/Tue/Thu/Fri publishing days elapsed since this date, so no external
 # state (files, DB) is needed to know whose turn it is.
 START_DATE = date(2026, 8, 3)
 
-OPED_WEEKDAYS = (0, 2, 4)  # Monday, Wednesday, Friday
+OPED_WEEKDAYS = (0, 1, 3, 4)  # Monday, Tuesday, Thursday, Friday (Wednesday skipped)
 
 OPINION_PROMPT_TEMPLATE = """You are {name}, {lens}, writing a 600-800 word opinion column for 24EcoNews's Opinion section.
 
@@ -83,7 +84,7 @@ def is_oped_day(day: date) -> bool:
 
 
 def _count_oped_days_before(day: date) -> int:
-    """Count Mon/Wed/Fri dates in [START_DATE, day)."""
+    """Count Mon/Tue/Thu/Fri dates in [START_DATE, day)."""
     if day <= START_DATE:
         return 0
     count = 0
@@ -97,7 +98,7 @@ def _count_oped_days_before(day: date) -> int:
 
 def persona_for_date(day: date) -> Persona:
     if not is_oped_day(day):
-        raise ValueError(f"{day.isoformat()} is not an OpEd day (Mon/Wed/Fri)")
+        raise ValueError(f"{day.isoformat()} is not an OpEd day (Mon/Tue/Thu/Fri)")
     index = _count_oped_days_before(day) % len(PERSONAS)
     return PERSONAS[index]
 
@@ -274,7 +275,7 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, pe
     if not is_oped_day(day):
         raise ValueError(
             f"{day.isoformat()} ({day.strftime('%A')}) is not an OpEd day — "
-            "OpEd pieces publish Monday, Wednesday, and Friday only."
+            "OpEd pieces publish Monday, Tuesday, Thursday, and Friday only."
         )
 
     if persona_slug is not None:
@@ -351,7 +352,7 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, pe
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate the Mercosur OpEd piece for 24EcoNews's Opinion section.")
-    parser.add_argument("--date", default=None, help="Publication date (YYYY-MM-DD), must be Mon/Wed/Fri; defaults to today")
+    parser.add_argument("--date", default=None, help="Publication date (YYYY-MM-DD), must be Mon/Tue/Thu/Fri; defaults to today")
     parser.add_argument("--lookback-days", type=int, default=5, help="How many days of digests to use as grounding material (default 5)")
     parser.add_argument("--dry-run", action="store_true", help="Show persona selection and prompt without calling the API or saving")
     parser.add_argument("--force", action="store_true", help="Overwrite an existing OpEd file for this persona/date instead of erroring")
