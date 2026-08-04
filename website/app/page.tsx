@@ -1,20 +1,24 @@
 import Link from 'next/link'
 import { countries, getActiveCountries, type Country } from '@/lib/countries'
 import { getCountryDigests, getDigest, formatDate, extractTeaser, type DigestContent } from '@/lib/digests'
+import { getAllOpeds, extractOpedExcerpt } from '@/lib/oped'
 import HeroRotator from '@/components/HeroRotator'
 import NewsletterSignup from '@/components/NewsletterSignup'
 
 export default async function HomePage() {
   const activeCountries = getActiveCountries()
 
-  const latestMetaBySlug = Object.fromEntries(
-    await Promise.all(
+  const [latestMetaEntries, allOpeds] = await Promise.all([
+    Promise.all(
       activeCountries.map(async (c) => {
         const digests = await getCountryDigests(c.slug)
         return [c.slug, digests[0] ?? null] as const
       })
-    )
-  )
+    ),
+    getAllOpeds(),
+  ])
+  const latestMetaBySlug = Object.fromEntries(latestMetaEntries)
+  const latestOpeds = allOpeds.slice(0, 3)
 
   const latestContentBySlug = Object.fromEntries(
     await Promise.all(
@@ -95,6 +99,51 @@ export default async function HomePage() {
           })}
         </div>
       </section>
+
+      {/* ── LATEST OPINION ── */}
+      {latestOpeds.length > 0 && (
+        <section className="border-t border-slate-100 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+            <div className="flex items-center gap-3 mb-8">
+              <span className="inline-flex items-center px-2.5 py-1 border-2 border-slate-900 text-slate-900 text-xs font-bold uppercase tracking-widest">
+                Opinion
+              </span>
+              <h2 className="text-2xl font-bold text-slate-900 font-serif italic">Latest Opinion</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {latestOpeds.map((oped) => {
+                const excerpt = extractOpedExcerpt(oped.paragraphs)
+                return (
+                  <Link
+                    key={`${oped.slug}-${oped.date}`}
+                    href={`/opinion/${oped.slug}/${oped.date}`}
+                    className="block border border-slate-200 bg-white p-6 hover:border-slate-400 hover:shadow-sm transition-all group"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <span className="inline-flex items-center px-2 py-0.5 border border-slate-900 text-slate-900 text-[10px] font-bold uppercase tracking-widest">
+                        Opinion
+                      </span>
+                      <span className="text-xs font-semibold text-slate-700">{oped.personaName}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 leading-snug mb-2 font-serif group-hover:text-red-700 transition-colors line-clamp-2">
+                      {oped.title}
+                    </h3>
+                    {excerpt && (
+                      <p className="text-slate-600 text-sm leading-relaxed mb-3 line-clamp-2">{excerpt}</p>
+                    )}
+                    <p className="text-xs text-slate-400">{formatDate(oped.date)}</p>
+                  </Link>
+                )
+              })}
+            </div>
+            <div className="mt-6">
+              <Link href="/opinion" className="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
+                More Opinion →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── COVERAGE MAP ── */}
       <section id="countries" className="border-t border-slate-100 bg-white">
