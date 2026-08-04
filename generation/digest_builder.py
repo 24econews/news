@@ -132,6 +132,11 @@ def _generate_headline(narrative: str, client: anthropic.Anthropic) -> str:
         messages=[{
             "role": "user",
             "content": (
+                "Write the headline in English, regardless of the language of the narrative "
+                "below (it may be in Spanish or Portuguese). Translate any translatable acronyms "
+                "into their standard English form — e.g., FMI → IMF, PIB → GDP, BCE → ECB — but "
+                "keep country-specific institution acronyms that have no English equivalent as-is "
+                "(e.g., BCRA, BCB, BNDES).\n\n"
                 "Write a headline (max 12 words) that captures the single most important or "
                 "surprising economic development described below. The headline should reflect "
                 "what is genuinely new or different today — not a generic summary of ongoing "

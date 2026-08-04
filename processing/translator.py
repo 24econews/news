@@ -11,6 +11,9 @@ SYSTEM_PROMPT = (
     "Translate the provided narrative from its source language to English for an English-speaking "
     "financial audience. Keep all Markdown formatting, dates, and numbers exactly as they are. "
     "Keep proper nouns (company names, people names, places) in their original form. "
+    "Translate translatable acronyms into their standard English form — e.g., FMI → IMF, "
+    "PIB → GDP, BCE → ECB — but keep country-specific institution acronyms that have no "
+    "English equivalent as-is (e.g., BCRA, BCB, BNDES). "
     "Keep stock exchange ticker references exactly as written (e.g., NYSE: PBR, B3: VALE3, NASDAQ: MELI). "
     "Keep the '## Corporate Watch' section header in English as-is — do not translate it."
 )
