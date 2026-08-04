@@ -20,6 +20,19 @@ export interface OpedContent extends OpedMeta {
 // canonical identity, independent of whatever the PERSONA/DATE metadata says.
 const FILENAME_RE = /^([a-z-]+)_(\d{4}-\d{2}-\d{2})\.md$/
 
+// DATE (and the filename date) are calendar dates assigned by the generation
+// pipeline running on GitHub Actions runners, which default to UTC — so
+// "today" for gating purposes is the server's UTC calendar date, not local
+// time. YYYY-MM-DD strings compare correctly with plain `<=`, same as the
+// `.localeCompare()` sorting already used on these dates elsewhere.
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+export function isPublished(date: string): boolean {
+  return date <= todayUTC()
+}
+
 export async function getAllOpeds(): Promise<OpedContent[]> {
   let files: Array<{ name: string; type: string }>
 
@@ -44,7 +57,7 @@ export async function getAllOpeds(): Promise<OpedContent[]> {
   )
 
   return opeds
-    .filter((o): o is OpedContent => o !== null)
+    .filter((o): o is OpedContent => o !== null && isPublished(o.date))
     .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug))
 }
 
@@ -52,6 +65,10 @@ export async function getOpedBySlugAndDate(
   slug: string,
   date: string
 ): Promise<OpedContent | null> {
+  // Gate on the URL's date before fetching — a future-dated slug/date pair
+  // must 404 even if the file already exists in the repo (it does, for the
+  // test pieces), so direct links can't leak content ahead of schedule.
+  if (!isPublished(date)) return null
   const content = await fetchText(`${RAW_BASE}/${OPED_DIR}/${slug}_${date}.md`)
   if (!content) return null
   return parseOped(content, slug, date)

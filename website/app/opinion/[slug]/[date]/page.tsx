@@ -32,6 +32,8 @@ export default async function OpedPage({
 }) {
   const { slug, date } = await params
 
+  // Returns null both when the file is missing and when its date is still
+  // in the future (see isPublished() in lib/oped.ts) — either way, 404.
   const oped = await getOpedBySlugAndDate(slug, date)
   if (!oped) notFound()
 
