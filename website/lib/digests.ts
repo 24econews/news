@@ -1,15 +1,15 @@
 import { getActiveCountries } from './countries'
 
 const REPO = '24econews/argentina'
-const API_BASE = `https://api.github.com/repos/${REPO}/contents`
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/main`
-const FETCH_OPTS = { next: { revalidate: 300 } } as const
+export const API_BASE = `https://api.github.com/repos/${REPO}/contents`
+export const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/main`
+export const FETCH_OPTS = { next: { revalidate: 300 } } as const
 
 function digestDir(country: string): string {
   return country === 'argentina' ? 'digests' : `digests/${country}`
 }
 
-async function fetchText(url: string): Promise<string | null> {
+export async function fetchText(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, FETCH_OPTS)
     return res.ok ? res.text() : null
