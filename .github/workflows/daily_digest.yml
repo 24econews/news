@@ -164,3 +164,14 @@ jobs:
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: |
           python publishing/post_all_countries_bluesky.py
+
+      # Placed after "Commit and push new digests" (same as the country-digest
+      # Bluesky step above) rather than immediately after OpEd generation, so
+      # the linked /opinion page is actually live on the site before it's posted.
+      - name: Post OpEd to Bluesky
+        if: steps.check_oped_day.outputs.is_oped_day == 'true'
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: |
+          python publishing/oped_bluesky_poster.py
