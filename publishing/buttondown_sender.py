@@ -67,6 +67,13 @@ def parse_briefing(path: str) -> tuple[str, str, str]:
     with open(path, encoding="utf-8") as f:
         content = f.read()
 
+    # The email subject is whatever weekly_briefing.py put on the first H1 line.
+    # As of the headline restructure, that's the catchy per-week headline it
+    # generates via a follow-up Haiku call (e.g. "Bolivia's Currency Gamble,
+    # Argentina's Borrowed Time") — not the old "Mercosur Weekly Briefing —
+    # Week of ..." format. No change needed here beyond this note: this
+    # extraction was always "subject = first H1 line," so it picked up the
+    # new format automatically once the source document changed.
     title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
     if not title_match:
         raise ValueError(f"No title line (# ...) found in {path}")
