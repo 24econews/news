@@ -9,6 +9,7 @@ assigned columnist's stated ideological perspective.
 import argparse
 import logging
 import os
+import re
 import sys
 from datetime import date, timedelta
 
@@ -48,7 +49,13 @@ OPINION_PROMPT_TEMPLATE = """You are {name}, {lens}, writing a 600-800 word opin
 
 Your rhetorical style: {style}
 
-Below is recent factual reporting on Brazil and Mercosur economic and political developments. Select the single most opinion-worthy story or tension from this material — something genuinely contestable, not settled consensus.
+Below is recent factual reporting on Brazil and Mercosur economic and political developments.
+
+Before selecting your subject, briefly survey the grounding material from ALL SIX countries — Brazil, Argentina, Chile, Uruguay, Paraguay, and Bolivia — not just the country with the most coverage that week. Brazil often generates the most dramatic headlines simply due to its size and market attention, but do not default to it for that reason alone. Actively consider whether Argentina, Chile, Uruguay, Paraguay, or Bolivia offers a more genuinely contestable, opinion-worthy angle this week — a story where reasonable people looking at the same facts would draw different conclusions.
+
+Over time, this column should reflect the full breadth of the Mercosur region, not become a Brazil-only column. Weight your selection accordingly.
+{country_nudge}
+Select the single most opinion-worthy story or tension from this material — something genuinely contestable, not settled consensus.
 
 Write a sharp, well-argued opinion piece from your stated ideological perspective. Your argument MUST be grounded in the real facts, figures, and events provided below — do not fabricate data, quotes, or events. You may interpret, emphasize, and draw conclusions the underlying reporting doesn't state explicitly, but the underlying facts must be real and traceable to the source material.
 
@@ -57,6 +64,18 @@ Write with conviction and a clear point of view — this is opinion writing, not
 Structure: a sharp opening that states your thesis, 3-4 paragraphs of argument grounded in specific facts, a closing that doesn't hedge.
 
 Do not include a byline or title — just the piece itself."""
+
+# Word-boundary patterns for each country's name plus its common English
+# adjectival form (e.g. "Brazilian"), used to mechanically infer which
+# country a past piece was actually about — see infer_primary_country().
+COUNTRY_MENTION_PATTERNS = {
+    "brazil": r"Brazil(?:ian)?",
+    "argentina": r"Argentin(?:a|e|ian)",
+    "chile": r"Chile|Chilean",
+    "uruguay": r"Uruguay(?:an)?",
+    "paraguay": r"Paraguay(?:an)?",
+    "bolivia": r"Bolivia(?:n)?",
+}
 
 
 def is_oped_day(day: date) -> bool:
@@ -98,11 +117,78 @@ def gather_recent_digests(reference_day: date, lookback_days: int = 5) -> list[d
     return results
 
 
-def build_prompt(persona: Persona, digests: list[dict]) -> str:
+def infer_primary_country(piece_body: str) -> str | None:
+    """Infer which country a past piece was mainly about by counting name mentions.
+
+    Returns None when no country has a clear plurality (zero mentions, or a
+    tie for the top spot) — an ambiguous piece shouldn't count toward or
+    break a streak either way.
+    """
+    counts = {
+        country: len(re.findall(rf"\b(?:{pattern})\b", piece_body, re.IGNORECASE))
+        for country, pattern in COUNTRY_MENTION_PATTERNS.items()
+    }
+    ranked = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)
+    top_country, top_count = ranked[0]
+    runner_up_count = ranked[1][1]
+    if top_count == 0 or top_count == runner_up_count:
+        return None
+    return top_country
+
+
+def _strip_oped_body(content: str) -> str:
+    """Strip the '> FIELD: ...' metadata block and trailing bio disclosure, mirroring save_oped's format."""
+    lines = content.split("\n")
+    i = 0
+    while i < len(lines) and lines[i].startswith(">"):
+        i += 1
+    if i < len(lines) and lines[i].strip() == "":
+        i += 1
+    body = "\n".join(lines[i:])
+    return body.split("\n---\n")[0].strip()
+
+
+def get_recent_country_streak(before_day: date, lookback_files: int = 10) -> list[str]:
+    """Return inferred primary countries for the most recent published pieces before before_day, newest first."""
+    if not os.path.isdir(OPED_OUTPUT_DIR):
+        return []
+
+    filename_re = re.compile(r"^([a-z-]+)_(\d{4}-\d{2}-\d{2})\.md$")
+    dated_files = []
+    for fname in os.listdir(OPED_OUTPUT_DIR):
+        match = filename_re.match(fname)
+        if not match:
+            continue
+        file_date = date.fromisoformat(match.group(2))
+        if file_date < before_day:
+            dated_files.append((file_date, fname))
+    dated_files.sort(key=lambda t: t[0], reverse=True)
+
+    countries = []
+    for _, fname in dated_files[:lookback_files]:
+        with open(os.path.join(OPED_OUTPUT_DIR, fname), encoding="utf-8") as f:
+            body = _strip_oped_body(f.read())
+        country = infer_primary_country(body)
+        if country:
+            countries.append(country)
+    return countries
+
+
+def build_prompt(persona: Persona, digests: list[dict], force_non_brazil: bool = False) -> str:
+    country_nudge = ""
+    if force_non_brazil:
+        country_nudge = (
+            "\nIMPORTANT: The last two published OpEd pieces both focused primarily on Brazil. "
+            "This piece MUST focus on a different country — Argentina, Chile, Uruguay, Paraguay, "
+            "or Bolivia. Do not select Brazil as your subject this time, even if its news is more "
+            "dramatic.\n"
+        )
+
     instructions = OPINION_PROMPT_TEMPLATE.format(
         name=persona.name,
         lens=persona.lens_full,
         style=persona.style,
+        country_nudge=country_nudge,
     )
 
     material_blocks = ["\n\n---\nRECENT REPORTING (Brazil and Mercosur):\n"]
@@ -215,7 +301,12 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, pe
             f"No digest material found in the {lookback_days} days ending {day.isoformat()} — aborting"
         )
 
-    prompt = build_prompt(persona, digests)
+    recent_countries = get_recent_country_streak(day)
+    force_non_brazil = len(recent_countries) >= 2 and recent_countries[0] == "brazil" and recent_countries[1] == "brazil"
+    if force_non_brazil:
+        logger.info(f"Last 2 published pieces were both Brazil-focused ({recent_countries[:2]}) — forcing a non-Brazil subject this run")
+
+    prompt = build_prompt(persona, digests, force_non_brazil)
 
     if dry_run:
         print(f"=== DRY RUN — OpEd for {day.isoformat()} ({day.strftime('%A')}) ===\n")
@@ -229,6 +320,8 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, pe
         print(f"\nGrounding material: {len(digests)} digest(s) from {lookback_days}-day lookback")
         for d in digests:
             print(f"  - [{d['country']}] {d['date']}: {d['title']}")
+        print(f"\nRecent country streak (newest first, up to 10): {recent_countries}")
+        print(f"Force non-Brazil this run: {force_non_brazil}")
         print(f"\nWould save to: {os.path.join(OPED_OUTPUT_DIR, f'{persona.slug}_{day.isoformat()}.md')}")
         print("\n--- FULL PROMPT ---\n")
         print(prompt)
@@ -245,11 +338,13 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, pe
     logger.info(f"OpEd piece saved to {path}")
 
     word_count = len(piece.split())
+    inferred_country = infer_primary_country(piece)
     print(piece)
     print("\n=== SUMMARY ===")
     print(f"Columnist: {persona.name} ({persona.lens_short})")
     print(f"Headline: {headline}")
     print(f"Word count: {word_count}")
+    print(f"Inferred subject country: {inferred_country or 'unclear'}")
     if not (600 <= word_count <= 800):
         logger.warning(f"Word count {word_count} is outside the target 600-800 range.")
 
