@@ -23,7 +23,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 sys.path.insert(0, REPO_ROOT)
 
-from generation.oped_personas import PERSONAS, Persona  # noqa: E402
+from generation.oped_personas import PERSONAS, PERSONAS_BY_SLUG, Persona  # noqa: E402
 from publishing.weekly_briefing import (  # noqa: E402
     COUNTRY_DISPLAY_NAMES,
     COUNTRY_ORDER,
@@ -182,7 +182,7 @@ def save_oped(persona: Persona, day: date, headline: str, piece: str) -> str:
     return path
 
 
-def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool) -> None:
+def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool, persona_slug: str | None = None) -> None:
     day = date.fromisoformat(date_arg) if date_arg else date.today()
 
     if not is_oped_day(day):
@@ -191,7 +191,16 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool) ->
             "OpEd pieces publish Monday, Wednesday, and Friday only."
         )
 
-    persona = persona_for_date(day)
+    if persona_slug is not None:
+        if persona_slug not in PERSONAS_BY_SLUG:
+            raise ValueError(
+                f"Unknown persona slug {persona_slug!r} — expected one of {sorted(PERSONAS_BY_SLUG)}"
+            )
+        persona = PERSONAS_BY_SLUG[persona_slug]
+        logger.info(f"--persona override: forcing columnist {persona.name} (rotation would assign {persona_for_date(day).name})")
+    else:
+        persona = persona_for_date(day)
+
     logger.info(f"=== OpEd for {day.isoformat()} ({day.strftime('%A')}) — columnist: {persona.name} ===")
 
     existing_path = os.path.join(OPED_OUTPUT_DIR, f"{persona.slug}_{day.isoformat()}.md")
@@ -213,7 +222,10 @@ def run(date_arg: str | None, dry_run: bool, lookback_days: int, force: bool) ->
         print(f"Columnist:  {persona.name}")
         print(f"Lens:       {persona.lens_short}")
         print(f"Slug:       {persona.slug}")
-        print(f"Rotation index: {_count_oped_days_before(day) % len(PERSONAS)} (of {len(PERSONAS)})")
+        if persona_slug is not None:
+            print(f"Rotation index: {_count_oped_days_before(day) % len(PERSONAS)} (of {len(PERSONAS)}) — OVERRIDDEN via --persona, would normally be {persona_for_date(day).name}")
+        else:
+            print(f"Rotation index: {_count_oped_days_before(day) % len(PERSONAS)} (of {len(PERSONAS)})")
         print(f"\nGrounding material: {len(digests)} digest(s) from {lookback_days}-day lookback")
         for d in digests:
             print(f"  - [{d['country']}] {d['date']}: {d['title']}")
@@ -248,10 +260,11 @@ if __name__ == "__main__":
     parser.add_argument("--lookback-days", type=int, default=5, help="How many days of digests to use as grounding material (default 5)")
     parser.add_argument("--dry-run", action="store_true", help="Show persona selection and prompt without calling the API or saving")
     parser.add_argument("--force", action="store_true", help="Overwrite an existing OpEd file for this persona/date instead of erroring")
+    parser.add_argument("--persona", default=None, choices=sorted(PERSONAS_BY_SLUG), help="TESTING ONLY: override the rotation and force a specific persona by slug")
     args = parser.parse_args()
 
     try:
-        run(args.date, args.dry_run, args.lookback_days, args.force)
+        run(args.date, args.dry_run, args.lookback_days, args.force, args.persona)
     except Exception as exc:
         logger.error(f"OpEd generation failed: {exc}")
         print(f"ERROR: {exc}", file=sys.stderr)
