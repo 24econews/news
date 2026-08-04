@@ -1,11 +1,14 @@
 """Build the daily Bloomberg-style narrative digest using Claude."""
 
+import logging
 from datetime import date
 from typing import List
 
 import anthropic
 
 from ingestion.rss_fetcher import Article
+
+logger = logging.getLogger(__name__)
 
 _TITLES = {
     "argentina": "Argentina: El Pulso Económico",
@@ -114,10 +117,12 @@ Articles:
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=2048,
+        max_tokens=8192,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_prompt}],
     )
+    if response.stop_reason == "max_tokens":
+        logger.warning("Digest narrative generation hit max_tokens — output may be truncated. Consider raising max_tokens.")
     narrative = response.content[0].text.strip()
 
     headline = _generate_headline(narrative, client)
