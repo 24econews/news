@@ -84,7 +84,11 @@ def parse_oped(path: str) -> tuple[str, str, str, list[str]]:
         i += 1
     if i < len(lines) and lines[i].strip() == "":
         i += 1
-    body = "\n".join(lines[i:]).split("\n---\n")[0]
+    # rsplit on the LAST "\n---\n" — Sonnet sometimes uses "---" as a stylistic
+    # mid-piece divider, and the bio-block separator save_oped() appends is
+    # always the final one, so splitting on the first occurrence would
+    # truncate the body (and its teaser) at that internal divider instead.
+    body = "\n".join(lines[i:]).rsplit("\n---\n", 1)[0]
 
     body_lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
     body_text = " ".join(body_lines)

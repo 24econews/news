@@ -146,7 +146,11 @@ def _strip_oped_body(content: str) -> str:
     if i < len(lines) and lines[i].strip() == "":
         i += 1
     body = "\n".join(lines[i:])
-    return body.split("\n---\n")[0].strip()
+    # rsplit on the LAST "\n---\n", not the first — Sonnet sometimes uses "---"
+    # as a stylistic mid-piece divider, and save_oped's bio-block separator is
+    # always the final one in the file, so splitting on the first occurrence
+    # would truncate the body at that internal divider instead.
+    return body.rsplit("\n---\n", 1)[0].strip()
 
 
 def get_recent_country_streak(before_day: date, lookback_files: int = 10) -> list[str]:

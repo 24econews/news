@@ -71,6 +71,30 @@ def run_cross_linking() -> None:
             logger.info(f"  • {event}")
 
 
+def run_opinion_linking() -> None:
+    """Link a relevant recent OpEd piece into today's digests, where one exists.
+
+    Must run after cross-linking (see opinion_linker.link_opinions' docstring) —
+    it always appends last, so a digest can carry both a Related Coverage block
+    and a Related Opinion block without the two interleaving.
+    """
+    sys.path.insert(0, REPO_ROOT)
+    from processing.opinion_linker import link_opinions
+
+    today = date.today()
+
+    logger.info("=== Opinion-linking started ===")
+    result = link_opinions(
+        digest_date=today,
+        countries=COUNTRIES,
+        digests_base_dir=REPO_ROOT,
+    )
+    linked = result.get("linked", [])
+    logger.info(f"Opinion-linking complete: {len(linked)} digest(s) linked to a Related Opinion piece")
+    if linked:
+        logger.info(f"  • {', '.join(linked)}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run all country pipelines, then cross-link.")
     parser.add_argument(
@@ -86,6 +110,12 @@ if __name__ == "__main__":
         except Exception as exc:
             logger.error(f"Cross-linking failed: {exc}")
             sys.exit(1)
+
+        try:
+            run_opinion_linking()
+        except Exception as exc:
+            logger.error(f"Opinion-linking failed: {exc}")
+            sys.exit(1)
     else:
         logger.info("=== run_all_countries started ===")
         for country in COUNTRIES:
@@ -96,5 +126,10 @@ if __name__ == "__main__":
             run_cross_linking()
         except Exception as exc:
             logger.error(f"Cross-linking failed (non-fatal): {exc}")
+
+        try:
+            run_opinion_linking()
+        except Exception as exc:
+            logger.error(f"Opinion-linking failed (non-fatal): {exc}")
 
         logger.info("=== run_all_countries finished ===")

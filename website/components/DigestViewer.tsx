@@ -17,27 +17,21 @@ interface CrossLink {
   links: Array<{ text: string; url: string }>
 }
 
-function parseRelatedCoverage(rawContent: string): {
-  mainContent: string
-  items: CrossLink[]
-} {
-  const markers = ['\n---\n## Related Coverage', '\n## Related Coverage']
-  let sepIdx = -1
-  let markerLen = 0
+interface RelatedOpinionLink {
+  title: string
+  url: string
+  byline: string
+}
 
+function findFirstMarker(rawContent: string, markers: string[]): { idx: number; len: number } | null {
   for (const marker of markers) {
     const idx = rawContent.indexOf(marker)
-    if (idx !== -1) {
-      sepIdx = idx
-      markerLen = marker.length
-      break
-    }
+    if (idx !== -1) return { idx, len: marker.length }
   }
+  return null
+}
 
-  if (sepIdx === -1) return { mainContent: rawContent, items: [] }
-
-  const mainContent = rawContent.slice(0, sepIdx)
-  const section = rawContent.slice(sepIdx + markerLen).trim()
+function parseCoverageItems(section: string): CrossLink[] {
   const items: CrossLink[] = []
 
   for (const block of section.split(/\n\n+/)) {
@@ -66,7 +60,52 @@ function parseRelatedCoverage(rawContent: string): {
     items.push({ event: eventMatch[1], summary: summaryLines.join(' '), links })
   }
 
-  return { mainContent, items }
+  return items
+}
+
+function parseOpinionSection(section: string): RelatedOpinionLink | null {
+  // Written by processing/opinion_linker.py as "[title](url)\nBy Name — Lens".
+  const linkMatch = section.match(/^\[([^\]]+)\]\(([^)]+)\)/m)
+  if (!linkMatch) return null
+  const bylineMatch = section.match(/^By .+$/m)
+  return { title: linkMatch[1], url: linkMatch[2], byline: bylineMatch ? bylineMatch[0] : '' }
+}
+
+// Splits a digest's raw content into narrative prose plus its two distinct
+// "Related" blocks — Related Coverage (cross-country news, from
+// processing/cross_linker.py) and Related Opinion (a linked OpEd piece, from
+// processing/opinion_linker.py). These must never be visually or
+// structurally conflated: one is more news, the other is editorial opinion.
+// opinion_linker.py always appends its block after cross_linker.py's, so in
+// practice Coverage precedes Opinion when both exist — but this is written
+// to handle either order or either section being absent.
+function parseDigestSections(rawContent: string): {
+  mainContent: string
+  coverageItems: CrossLink[]
+  opinion: RelatedOpinionLink | null
+} {
+  const coverageMarker = findFirstMarker(rawContent, ['\n---\n## Related Coverage', '\n## Related Coverage'])
+  const opinionMarker = findFirstMarker(rawContent, ['\n---\n## Related Opinion', '\n## Related Opinion'])
+
+  const cutoffs = [coverageMarker?.idx, opinionMarker?.idx].filter((n): n is number => n !== undefined)
+  const mainEnd = cutoffs.length ? Math.min(...cutoffs) : rawContent.length
+  const mainContent = rawContent.slice(0, mainEnd)
+
+  let coverageItems: CrossLink[] = []
+  if (coverageMarker) {
+    const sectionEnd = opinionMarker && opinionMarker.idx > coverageMarker.idx ? opinionMarker.idx : rawContent.length
+    const section = rawContent.slice(coverageMarker.idx + coverageMarker.len, sectionEnd).trim()
+    coverageItems = parseCoverageItems(section)
+  }
+
+  let opinion: RelatedOpinionLink | null = null
+  if (opinionMarker) {
+    const sectionEnd = coverageMarker && coverageMarker.idx > opinionMarker.idx ? coverageMarker.idx : rawContent.length
+    const section = rawContent.slice(opinionMarker.idx + opinionMarker.len, sectionEnd).trim()
+    opinion = parseOpinionSection(section)
+  }
+
+  return { mainContent, coverageItems, opinion }
 }
 
 function RelatedCoverage({ items }: { items: CrossLink[] }) {
@@ -113,8 +152,34 @@ function RelatedCoverage({ items }: { items: CrossLink[] }) {
   )
 }
 
+function RelatedOpinion({ opinion }: { opinion: RelatedOpinionLink | null }) {
+  if (!opinion) return null
+
+  return (
+    <div className="mt-6 rounded-xl border-2 border-slate-900 overflow-hidden">
+      <div className="bg-slate-900 px-5 py-3 flex items-center gap-2">
+        <span className="inline-flex items-center px-2 py-0.5 border border-white text-white text-[10px] font-bold uppercase tracking-widest">
+          Opinion
+        </span>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-white">
+          Related Opinion
+        </h2>
+      </div>
+      <div className="bg-white px-5 py-4">
+        <Link
+          href={opinion.url}
+          className="text-slate-900 font-semibold text-sm leading-snug hover:text-red-700 transition-colors"
+        >
+          {opinion.title}
+        </Link>
+        {opinion.byline && <p className="text-xs text-slate-500 mt-1.5">{opinion.byline}</p>}
+      </div>
+    </div>
+  )
+}
+
 function NarrativeContent({ rawContent }: { rawContent: string }) {
-  const { mainContent, items } = parseRelatedCoverage(rawContent)
+  const { mainContent, coverageItems, opinion } = parseDigestSections(rawContent)
 
   const paragraphs = mainContent
     .split('\n\n')
@@ -132,7 +197,8 @@ function NarrativeContent({ rawContent }: { rawContent: string }) {
           ))}
         </div>
       </div>
-      <RelatedCoverage items={items} />
+      <RelatedCoverage items={coverageItems} />
+      <RelatedOpinion opinion={opinion} />
     </>
   )
 }
