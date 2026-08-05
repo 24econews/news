@@ -83,23 +83,6 @@ jobs:
         run: |
           python scheduler/run_all_countries.py --cross-link-only
 
-      - name: Check if Thursday
-        id: check_day
-        run: |
-          if [ "$(date +%u)" = "4" ]; then
-            echo "is_thursday=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_thursday=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate Weekly Briefing
-        if: github.event_name == 'schedule' &&
-            steps.check_day.outputs.is_thursday == 'true'
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          python publishing/weekly_briefing.py
-
       - name: Check if OpEd day (Mon/Tue/Thu/Fri)
         id: check_oped_day
         run: |
@@ -117,13 +100,38 @@ jobs:
         run: |
           python generation/oped_builder.py
 
+      - name: Check if Friday
+        id: check_day
+        run: |
+          if [ "$(date +%u)" = "5" ]; then
+            echo "is_friday=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_friday=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Runs after "Generate OpEd piece" (not before) so that on Fridays —
+      # which are both a weekly-briefing day and an OpEd day — that same day's
+      # OpEd file already exists on disk before gather_recent_opeds() runs.
+      # With the reverse order, a same-day OpEd would be dated exactly on the
+      # window's inclusive upper bound but not yet exist at gather time, and
+      # would then fall on next week's exclusive lower bound too — silently
+      # and permanently dropped from every Opinion Roundup.
+      - name: Generate Weekly Briefing
+        if: github.event_name == 'schedule' &&
+            steps.check_day.outputs.is_friday == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python publishing/weekly_briefing.py
+
       # Newsletter sending moved to a separate Friday-morning workflow
-      # (.github/workflows/send_newsletter.yml) so the send happens the
-      # morning after the briefing is generated, not immediately on Thursday.
+      # (.github/workflows/send_newsletter.yml) which runs a few hours after
+      # this workflow's Friday run generates the briefing, rather than
+      # sending inline here.
 
       # - name: Send Weekly Newsletter via Buttondown
       #   if: github.event_name == 'schedule' &&
-      #       steps.check_day.outputs.is_thursday == 'true'
+      #       steps.check_day.outputs.is_friday == 'true'
       #   env:
       #     BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
       #   run: |

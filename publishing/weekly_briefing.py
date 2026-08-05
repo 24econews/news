@@ -39,7 +39,7 @@ MODEL = "claude-sonnet-4-6"
 
 EDITOR_INSTRUCTIONS = """You are the editor of 24EcoNews, a weekly economic briefing covering the Mercosur region for a global audience of investors, analysts, and business professionals.
 
-Below are this week's daily digest narratives for 6 countries: Argentina, Brazil, Chile, Uruguay, Paraguay and Bolivia — with MULTIPLE dated digests provided per country (Monday through Thursday, whichever days exist), each with its own URL. Also below, in OPED DATA, are any Opinion columns published since last week's briefing.
+Below are this week's daily digest narratives for 6 countries: Argentina, Brazil, Chile, Uruguay, Paraguay and Bolivia — with MULTIPLE dated digests provided per country (Monday through Friday, whichever days exist), each with its own URL. Also below, in OPED DATA, are any Opinion columns published since last week's briefing.
 
 Write a Mercosur Weekly Briefing with this structure:
 
@@ -336,9 +336,9 @@ def generate_headline(body: str) -> str:
     return response.content[0].text.strip()
 
 
-def save_briefing(content: str, thursday: date) -> str:
+def save_briefing(content: str, friday: date) -> str:
     os.makedirs(WEEKLY_OUTPUT_DIR, exist_ok=True)
-    path = os.path.join(WEEKLY_OUTPUT_DIR, f"briefing_{thursday.isoformat()}.md")
+    path = os.path.join(WEEKLY_OUTPUT_DIR, f"briefing_{friday.isoformat()}.md")
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     return path
@@ -391,15 +391,14 @@ def print_summary(content: str, country_data: dict, oped_pieces: list[dict], hea
 
 def run(week_arg: str | None, dry_run: bool) -> None:
     monday = monday_of_week(week_arg)
-    thursday = monday + timedelta(days=3)
-    friday = thursday + timedelta(days=1)  # actual send date — the briefing is generated Thursday, sent Friday morning
-    week_days = [monday + timedelta(days=i) for i in range(4)]
-    last_friday = monday - timedelta(days=3)  # exclusive lower bound for the OpEd lookback window
+    friday = monday + timedelta(days=4)  # last digest day AND send date — generation now runs Friday, same day as send
+    week_days = [monday + timedelta(days=i) for i in range(5)]
+    last_friday = monday - timedelta(days=3)  # exclusive lower bound for the OpEd lookback window (previous week's Friday)
 
-    logger.info(f"=== Weekly Briefing — week of {monday.isoformat()} to {thursday.isoformat()} (sends {friday.isoformat()}) ===")
+    logger.info(f"=== Weekly Briefing — week of {monday.isoformat()} to {friday.isoformat()} (sends {friday.isoformat()}) ===")
 
     if dry_run:
-        print(f"=== DRY RUN — week of {monday.isoformat()} (Mon) to {thursday.isoformat()} (Thu) ===\n")
+        print(f"=== DRY RUN — week of {monday.isoformat()} (Mon) to {friday.isoformat()} (Fri) ===\n")
         for country in COUNTRY_ORDER:
             found_days = [d for d in week_days if os.path.exists(digest_path(country, d))]
             if not found_days:
@@ -408,12 +407,12 @@ def run(week_arg: str | None, dry_run: bool) -> None:
             else:
                 print(f"[{country}] Would use {len(found_days)} day(s): {', '.join(d.isoformat() for d in found_days)}")
 
-        opeds = gather_recent_opeds(last_friday, thursday)
-        print(f"\nOpEd pieces since last briefing ({last_friday.isoformat()} exclusive → {thursday.isoformat()} inclusive): {len(opeds)}")
+        opeds = gather_recent_opeds(last_friday, friday)
+        print(f"\nOpEd pieces since last briefing ({last_friday.isoformat()} exclusive → {friday.isoformat()} inclusive): {len(opeds)}")
         for o in opeds:
             print(f"  - [{o['date']}] {o['persona_name']}: {o['title']}")
 
-        print(f"\nDate range covered: {monday.isoformat()} (Mon) through {thursday.isoformat()} (Thu)")
+        print(f"\nDate range covered: {monday.isoformat()} (Mon) through {friday.isoformat()} (Fri)")
         print(f"Send date (document date line): {friday.strftime('%A, %B %-d, %Y')}")
         print("Dry run — Sonnet API not called, no file saved.")
         return
@@ -422,7 +421,7 @@ def run(week_arg: str | None, dry_run: bool) -> None:
     if all(not v for v in country_data.values()):
         raise RuntimeError(f"No digests found for any country in week of {monday.isoformat()} — aborting")
 
-    oped_pieces = gather_recent_opeds(last_friday, thursday)
+    oped_pieces = gather_recent_opeds(last_friday, friday)
 
     prompt = build_prompt(country_data, oped_pieces)
 
@@ -443,7 +442,7 @@ def run(week_arg: str | None, dry_run: bool) -> None:
 
     briefing = f"{greeting}\n\n# {headline}\n\n*{send_date_display}*\n\n{rest}"
 
-    path = save_briefing(briefing, thursday)
+    path = save_briefing(briefing, friday)
     logger.info(f"Weekly briefing saved to {path}")
 
     print(briefing)

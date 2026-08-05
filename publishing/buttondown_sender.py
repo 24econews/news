@@ -43,8 +43,8 @@ def append_subscribe_block(body: str) -> str:
     return f"{body.rstrip()}\n\n{SUBSCRIBE_BLOCK}"
 
 
-def thursday_of_week(week_arg: str | None) -> date:
-    """--week takes the Monday (YYYY-MM-DD) of the target week; returns that week's Thursday."""
+def friday_of_week(week_arg: str | None) -> date:
+    """--week takes the Monday (YYYY-MM-DD) of the target week; returns that week's Friday."""
     if week_arg:
         monday = date.fromisoformat(week_arg)
         if monday.weekday() != 0:
@@ -52,11 +52,11 @@ def thursday_of_week(week_arg: str | None) -> date:
     else:
         today = date.today()
         monday = today - timedelta(days=today.weekday())
-    return monday + timedelta(days=3)
+    return monday + timedelta(days=4)
 
 
-def briefing_path(thursday: date) -> str:
-    return os.path.join(WEEKLY_BRIEFING_DIR, f"briefing_{thursday.isoformat()}.md")
+def briefing_path(friday: date) -> str:
+    return os.path.join(WEEKLY_BRIEFING_DIR, f"briefing_{friday.isoformat()}.md")
 
 
 def parse_briefing(path: str) -> tuple[str, str, str]:
@@ -124,8 +124,8 @@ def run(week_arg: str | None, dry_run: bool, test_send: bool, confirm_live_send:
     if test_send and confirm_live_send:
         raise ValueError("--test-send and --confirm-live-send are mutually exclusive — pick one.")
 
-    thursday = thursday_of_week(week_arg)
-    path = briefing_path(thursday)
+    friday = friday_of_week(week_arg)
+    path = briefing_path(friday)
 
     logger.info(f"Reading weekly briefing: {path}")
     subject, greeting, body = parse_briefing(path)
