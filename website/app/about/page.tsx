@@ -36,10 +36,15 @@ export default function AboutPage() {
           market reaction, a regional ripple effect — are automatically cross-linked between
           countries.
         </p>
-        <p className="text-slate-600 leading-relaxed">
+        <p className="text-slate-600 leading-relaxed mb-4">
           This is, by design, a mix of AI and editorial judgment: AI handles the heavy lifting of
           monitoring dozens of sources and drafting each day&apos;s narrative, while our editorial
           team sets the sourcing, reviews the output, and steers the coverage.
+        </p>
+        <p className="text-slate-600 leading-relaxed">
+          Our weekly Mercosur Briefing is signed &quot;John Dominguez, Editor&quot; — a recurring
+          editorial byline representing our team&apos;s synthesis and judgment each week, not an
+          individual staff member.
         </p>
       </div>
 
