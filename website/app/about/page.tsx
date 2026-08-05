@@ -45,12 +45,16 @@ export default function AboutPage() {
 
       <div className="mb-10">
         <h2 className="text-xl font-bold text-slate-900 border-l-4 border-red-600 pl-3 mb-4">
-          What&apos;s next
+          Opinion
         </h2>
         <p className="text-slate-600 leading-relaxed">
-          We&apos;re actively building out 24EcoNews. Coming soon is an Op-Ed section featuring
-          original analysis — both human-written and AI-assisted — going deeper on the stories and
-          trends shaping the region.
+          Alongside our daily reporting, 24EcoNews Opinion features eight recurring columnists,
+          each bringing a distinct editorial perspective to Mercosur affairs — from market-liberal
+          and social-democratic viewpoints to regional sovereigntist and geopolitical-realist
+          analysis, plus dedicated columnists covering agriculture, technology, and commodities.
+          These pieces represent the views of their authors, clearly distinguished from our neutral
+          news reporting, and are grounded in the same real-world reporting that powers our daily
+          digests.
         </p>
       </div>
 

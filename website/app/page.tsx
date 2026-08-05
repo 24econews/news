@@ -56,7 +56,7 @@ export default async function HomePage() {
               Get the Weekly Mercosur Briefing in your inbox
             </h2>
             <p className="text-slate-500 text-sm">
-              One email every Thursday. The region&apos;s biggest economic stories, distilled.
+              One email every Friday. The region&apos;s biggest economic stories, distilled.
             </p>
           </div>
           <NewsletterSignup />
