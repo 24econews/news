@@ -76,7 +76,11 @@ def run_opinion_linking() -> None:
 
     Must run after cross-linking (see opinion_linker.link_opinions' docstring) —
     it always appends last, so a digest can carry both a Related Coverage block
-    and a Related Opinion block without the two interleaving.
+    and a Related Opinion block without the two interleaving. Must ALSO run
+    after that day's OpEd generation step (generation/oped_builder.py), which
+    is why the workflow invokes this via --link-opinions-only as its own step
+    positioned after "Generate OpEd piece" — running it any earlier would
+    miss linking that day's own OpEd into that day's digests.
     """
     sys.path.insert(0, REPO_ROOT)
     from processing.opinion_linker import link_opinions
@@ -100,7 +104,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cross-link-only",
         action="store_true",
-        help="Skip country pipelines — only run the cross-linking step",
+        help="Skip country pipelines — only run the cross-linking (Related Coverage) step",
+    )
+    parser.add_argument(
+        "--link-opinions-only",
+        action="store_true",
+        help="Skip country pipelines and cross-linking — only run the Related Opinion linking step",
     )
     args = parser.parse_args()
 
@@ -110,7 +119,7 @@ if __name__ == "__main__":
         except Exception as exc:
             logger.error(f"Cross-linking failed: {exc}")
             sys.exit(1)
-
+    elif args.link_opinions_only:
         try:
             run_opinion_linking()
         except Exception as exc:

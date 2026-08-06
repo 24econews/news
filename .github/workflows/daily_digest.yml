@@ -100,6 +100,17 @@ jobs:
         run: |
           python generation/oped_builder.py
 
+      # Must run after "Generate OpEd piece" (not bundled into the
+      # cross-linking step above) so that on OpEd days, that same day's
+      # OpEd file already exists on disk before opinion_linker looks for a
+      # relevant piece to link — otherwise it silently falls back to an
+      # older piece instead of today's own, more relevant one. Runs every
+      # day (not just OpEd days) since Related Opinion still needs to stay
+      # current on non-OpEd days; it just won't find a same-day piece then.
+      - name: Link Related Opinion pieces into today's digests
+        run: |
+          python scheduler/run_all_countries.py --link-opinions-only
+
       - name: Check if Friday
         id: check_day
         run: |

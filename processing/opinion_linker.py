@@ -58,8 +58,16 @@ def _oped_metadata(path: str) -> dict | None:
 
 def find_related_oped(country: str, digest_date: date) -> dict | None:
     """Return the most recent published OpEd about `country` in the lookback
-    window before digest_date (strictly before — never same-day or future),
-    or None if none is genuinely about that country."""
+    window up to and including digest_date (never future), or None if none
+    is genuinely about that country.
+
+    Same-day pieces are eligible: this function is only meant to run after
+    that day's OpEd generation has completed (see the workflow's step order
+    in .github/workflows/daily_digest.yml), so by the time it runs, a
+    same-day piece already exists on disk and is exactly the most relevant
+    thing to link — excluding it would silently prefer a stale, older piece
+    over today's own, more relevant one.
+    """
     if not os.path.isdir(OPED_OUTPUT_DIR):
         return None
 
@@ -71,7 +79,7 @@ def find_related_oped(country: str, digest_date: date) -> dict | None:
             continue
         slug, date_str = match.group(1), match.group(2)
         oped_date = date.fromisoformat(date_str)
-        if earliest <= oped_date < digest_date:
+        if earliest <= oped_date <= digest_date:
             candidates.append((oped_date, slug, date_str, fname))
 
     candidates.sort(key=lambda t: t[0], reverse=True)
@@ -109,7 +117,9 @@ def link_opinions(digest_date: date, countries: list, digests_base_dir: str) -> 
     if a relevant recent OpEd exists. Must run AFTER cross_linker's Related
     Coverage injection for the same date — this always appends last, so the
     two blocks never interleave and the website can split on whichever marker
-    it needs. Returns {linked: [country, ...]}."""
+    it needs. Must ALSO run AFTER that day's OpEd generation step (see
+    find_related_oped's docstring) so a same-day piece is actually on disk
+    and linkable, not just yesterday's. Returns {linked: [country, ...]}."""
     linked = []
 
     for country in countries:
