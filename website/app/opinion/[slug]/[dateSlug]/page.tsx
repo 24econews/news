@@ -34,9 +34,29 @@ export async function generateMetadata({
   if (!date) return {}
   const oped = await getOpedBySlugAndDate(slug, date)
   if (!oped) return {}
+
+  const description = extractOpedExcerpt(oped.paragraphs)
+  const url = `${BASE}${buildOpinionUrl(oped.slug, oped.date, oped.title)}`
+  const publishedTime = `${oped.date}T00:00:00.000Z`
+
   return {
     title: `${oped.title} | 24EcoNews Opinion`,
-    description: extractOpedExcerpt(oped.paragraphs),
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: oped.title,
+      description,
+      url,
+      siteName: '24EcoNews',
+      locale: 'en_US',
+      type: 'article',
+      publishedTime,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: oped.title,
+      description,
+    },
   }
 }
 

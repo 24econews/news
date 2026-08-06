@@ -6,10 +6,28 @@ import { buildOpinionUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 20
 
+const BASE = 'https://24econews.com'
+const PAGE_TITLE = 'Opinion | 24EcoNews'
+const PAGE_DESCRIPTION =
+  '24EcoNews Opinion features five recurring columnists offering distinct editorial perspectives on Mercosur affairs.'
+
 export const metadata: Metadata = {
-  title: 'Opinion | 24EcoNews',
-  description:
-    '24EcoNews Opinion features five recurring columnists offering distinct editorial perspectives on Mercosur affairs.',
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
+  alternates: { canonical: `${BASE}/opinion` },
+  openGraph: {
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: `${BASE}/opinion`,
+    siteName: '24EcoNews',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+  },
 }
 
 export default async function OpinionPage({

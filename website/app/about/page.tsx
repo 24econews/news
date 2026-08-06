@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'About | 24EcoNews',
+  description:
+    '24EcoNews is an independent economic news platform covering the Mercosur region — Argentina, Brazil, Chile, Uruguay, Paraguay, and Bolivia.',
 }
 
 export default function AboutPage() {

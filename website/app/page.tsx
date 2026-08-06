@@ -1,10 +1,36 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { countries, getActiveCountries, type Country } from '@/lib/countries'
 import { getCountryDigests, getDigest, formatDate, extractTeaser, type DigestContent } from '@/lib/digests'
 import { getAllOpeds, extractOpedExcerpt } from '@/lib/oped'
 import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 import HeroRotator from '@/components/HeroRotator'
 import NewsletterSignup from '@/components/NewsletterSignup'
+
+const BASE = 'https://24econews.com'
+
+const SITE_TITLE = '24EcoNews — Global Economic Intelligence'
+const SITE_DESCRIPTION =
+  'Daily economic narratives from the world\'s most important emerging markets. Coverage of Argentina, Brazil, and the Mercosur region.'
+
+export const metadata: Metadata = {
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: BASE },
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: BASE,
+    siteName: '24EcoNews',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+}
 
 export default async function HomePage() {
   const activeCountries = getActiveCountries()

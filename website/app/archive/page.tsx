@@ -6,9 +6,12 @@ import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 50
 
+const BASE = 'https://24econews.com'
+
 export const metadata: Metadata = {
   title: 'Archive | 24EcoNews',
   description: 'Every daily economic digest published by 24EcoNews, across all countries.',
+  alternates: { canonical: `${BASE}/archive` },
 }
 
 export default async function ArchivePage({

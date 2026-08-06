@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Contact | 24EcoNews',
+  description: 'Have a question, a tip, or feedback on 24EcoNews coverage? Get in touch with our editorial team.',
 }
 
 export default function ContactPage() {

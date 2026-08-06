@@ -1,13 +1,34 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { getCountry, getActiveCountries } from '@/lib/countries'
 import { getCountryDigests, formatDate } from '@/lib/digests'
 import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 10
+const BASE = 'https://24econews.com'
 
 export async function generateStaticParams() {
   return getActiveCountries().map((c) => ({ country: c.slug }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ country: string }>
+}): Promise<Metadata> {
+  const { country: countrySlug } = await params
+  const countryInfo = getCountry(countrySlug)
+  if (!countryInfo || !countryInfo.active) return {}
+
+  const title = `${countryInfo.name} Economic Digest | 24EcoNews`
+  const description = `Daily economic digest coverage of ${countryInfo.name}: inflation, currency, trade, and policy news, drawn from ${countryInfo.sources.join(', ')}.`
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `${BASE}/${countrySlug}` },
+  }
 }
 
 export default async function CountryPage({

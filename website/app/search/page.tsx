@@ -1,7 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { getActiveCountries } from '@/lib/countries'
 import { searchDigests, formatDate } from '@/lib/digests'
 import { buildDigestUrl } from '@/lib/slugify'
+
+export const metadata: Metadata = {
+  title: 'Search | 24EcoNews',
+  description: 'Search across all 24EcoNews economic digests by keyword or country.',
+}
 
 function highlight(text: string, query: string): string {
   if (!query.trim()) return text

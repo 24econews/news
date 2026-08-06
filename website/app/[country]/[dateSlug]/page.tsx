@@ -38,10 +38,33 @@ export async function generateMetadata({
   if (!date) return {}
   const digest = await getDigest(country, date)
   if (!digest) return {}
+
+  const countryInfo = getCountry(country)
+  const title = digest.title || `${countryInfo?.name ?? country} Economic Digest`
+  const description = extractTeaser(digest.rawContent) || digest.firstHeadline
+  const url = `${BASE}${buildDigestUrl(country, date, digest.title)}`
+  const publishedTime = `${date}T00:00:00.000Z`
+
   return {
-    title: `${digest.title} | 24EcoNews`,
-    description: digest.firstHeadline,
-    openGraph: digest.image_url ? { images: [digest.image_url] } : undefined,
+    title: `${title} | 24EcoNews`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: '24EcoNews',
+      images: digest.image_url ? [digest.image_url] : undefined,
+      locale: 'en_US',
+      type: 'article',
+      publishedTime,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: digest.image_url ? [digest.image_url] : undefined,
+    },
   }
 }
 

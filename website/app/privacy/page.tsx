@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | 24EcoNews',
+  description: 'How 24EcoNews collects, uses, and protects your data.',
 }
 
 function Section({ num, title, children }: { num: number; title: string; children: React.ReactNode }) {
