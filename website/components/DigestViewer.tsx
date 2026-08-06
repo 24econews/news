@@ -3,12 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { DigestContent } from '@/lib/digests'
+import BlueskyShareButton from './BlueskyShareButton'
 
 interface Props {
   digest: DigestContent
   country: string
   countryName: string
   countryFlag: string
+  canonicalUrl: string
 }
 
 interface CrossLink {
@@ -203,7 +205,7 @@ function NarrativeContent({ rawContent }: { rawContent: string }) {
   )
 }
 
-function ShareBar({ title }: { title: string }) {
+function ShareBar({ title, canonicalUrl }: { title: string; canonicalUrl: string }) {
   const [url, setUrl] = useState('')
   const [copied, setCopied] = useState(false)
 
@@ -273,6 +275,9 @@ function ShareBar({ title }: { title: string }) {
           WhatsApp
         </a>
 
+        {/* Bluesky */}
+        <BlueskyShareButton text={title} url={canonicalUrl} label="Bluesky" />
+
         {/* Copy Link */}
         <button onClick={copyLink} className={btnClass}>
           {copied ? (
@@ -303,6 +308,7 @@ export default function DigestViewer({
   country,
   countryName,
   countryFlag,
+  canonicalUrl,
 }: Props) {
   return (
     <div>
@@ -342,7 +348,7 @@ export default function DigestViewer({
         </div>
 
           {/* Share bar */}
-        <ShareBar title={digest.title} />
+        <ShareBar title={digest.title} canonicalUrl={canonicalUrl} />
 
         {/* Articles or narrative content */}
         {digest.articles.length > 0 ? (

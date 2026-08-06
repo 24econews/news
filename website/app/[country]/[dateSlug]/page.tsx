@@ -84,6 +84,7 @@ export default async function DigestPage({
   const digest = await getDigest(countrySlug, date)
   if (!digest) notFound()
 
+  const canonicalUrl = `${BASE}${buildDigestUrl(countrySlug, date, digest.title)}`
   const publishedDate = `${date}T00:00:00.000Z`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -95,7 +96,7 @@ export default async function DigestPage({
     publisher: { '@type': 'Organization', name: '24EcoNews' },
     ...(digest.image_url ? { image: digest.image_url } : {}),
     description: extractTeaser(digest.rawContent) || digest.firstHeadline,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}${buildDigestUrl(countrySlug, date, digest.title)}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
   }
 
   return (
@@ -143,6 +144,7 @@ export default async function DigestPage({
         country={countrySlug}
         countryName={countryInfo.name}
         countryFlag={countryInfo.flag}
+        canonicalUrl={canonicalUrl}
       />
     </>
   )

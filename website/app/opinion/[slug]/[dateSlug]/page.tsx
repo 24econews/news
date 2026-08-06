@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { getAllOpeds, getOpedBySlugAndDate, extractOpedExcerpt } from '@/lib/oped'
 import { formatDate } from '@/lib/digests'
 import { buildOpinionUrl } from '@/lib/slugify'
+import BlueskyShareButton from '@/components/BlueskyShareButton'
 
 const BASE = 'https://24econews.com'
 
@@ -74,6 +75,7 @@ export default async function OpedPage({
   const oped = await getOpedBySlugAndDate(slug, date)
   if (!oped) notFound()
 
+  const canonicalUrl = `${BASE}${buildOpinionUrl(oped.slug, oped.date, oped.title)}`
   const publishedDate = `${oped.date}T00:00:00.000Z`
   const description = extractOpedExcerpt(oped.paragraphs)
 
@@ -88,7 +90,7 @@ export default async function OpedPage({
     author: { '@type': 'Person', name: oped.personaName },
     publisher: { '@type': 'Organization', name: '24EcoNews' },
     description,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}${buildOpinionUrl(oped.slug, oped.date, oped.title)}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
   }
 
   return (
@@ -121,7 +123,8 @@ export default async function OpedPage({
             <span className="text-slate-400"> · </span>
             <span>{oped.lensShort}</span>
           </p>
-          <p className="text-xs text-slate-400">{formatDate(oped.date)}</p>
+          <p className="text-xs text-slate-400 mb-4">{formatDate(oped.date)}</p>
+          <BlueskyShareButton text={oped.title} url={canonicalUrl} />
         </div>
 
         <div className="prose prose-slate max-w-none">
