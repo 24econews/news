@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCountry, getActiveCountries } from '@/lib/countries'
 import { getCountryDigests, formatDate } from '@/lib/digests'
+import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 10
 
@@ -59,7 +60,7 @@ export default async function CountryPage({
             {digests.map((digest) => (
               <li key={digest.date}>
                 <Link
-                  href={`/${countrySlug}/${digest.date}`}
+                  href={buildDigestUrl(countrySlug, digest.date, digest.title)}
                   className="flex items-center justify-between gap-4 bg-white rounded-xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
                 >
                   <div className="min-w-0">

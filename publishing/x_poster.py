@@ -15,6 +15,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, REPO_ROOT)
+
+from generation.slugify import build_digest_url  # noqa: E402
 
 TWEET_MAX_CHARS = 280
 SITE_BASE_URL = "https://24econews.com"
@@ -110,7 +113,7 @@ def fit_teaser(sentences: list[str], available_chars: int) -> str:
 
 def compose_tweet(country: str, date_str: str, title: str, sentences: list[str]) -> str:
     flag = FLAGS[country]
-    url = f"{SITE_BASE_URL}/{country}/{date_str}"
+    url = f"{SITE_BASE_URL}{build_digest_url(country, date_str, title)}"
     header = f"{flag} {title}"
     footer = f"📰 {url}"
 

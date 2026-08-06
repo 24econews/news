@@ -20,6 +20,9 @@ sys.path.insert(0, SCRIPT_DIR)
 from x_poster import COUNTRY_OUTPUT_DIRS, FLAGS, REPO_ROOT, SITE_BASE_URL  # noqa: E402
 from oped_bluesky_poster import parse_oped  # noqa: E402 (sibling module in publishing/, reuses its PERSONA/LENS/TITLE parsing)
 
+sys.path.insert(0, REPO_ROOT)
+from generation.slugify import build_digest_url, build_opinion_url  # noqa: E402
+
 OPED_DIR = os.path.join(REPO_ROOT, "digests", "opinion")
 
 COUNTRY_ORDER = ["brazil", "argentina", "chile", "uruguay", "paraguay", "bolivia"]
@@ -168,7 +171,7 @@ def parse_country_digest(path: str, country: str, day: date) -> dict:
         corporate_watch = None
         narrative = body.strip()
 
-    url = f"{SITE_BASE_URL}/{country}/{day.isoformat()}"
+    url = f"{SITE_BASE_URL}{build_digest_url(country, day, title)}"
     return {
         "country": country,
         "title": title,
@@ -230,7 +233,7 @@ def gather_recent_opeds(since_day: date, until_day: date) -> list[dict]:
             "lens_short": lens_short,
             "title": title,
             "excerpt": " ".join(sentences[:2]),
-            "url": f"{SITE_BASE_URL}/opinion/{slug}/{date_str}",
+            "url": f"{SITE_BASE_URL}{build_opinion_url(slug, date_str, title)}",
         })
         logger.info(f"[weekly_briefing] Including OpEd {slug}_{date_str} in roundup")
 

@@ -4,8 +4,15 @@ import json
 import logging
 import os
 import re
+import sys
 
 import anthropic
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(SCRIPT_DIR)
+sys.path.insert(0, REPO_ROOT)
+
+from generation.slugify import build_digest_url  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +69,7 @@ def _build_cross_ref_block(country: str, connections: list, date: str) -> str:
         for other in others:
             meta = COUNTRY_META[other]
             title = conn.get("titles", {}).get(other, "")
-            url = f"/{other}/{date}"
+            url = build_digest_url(other, date, title)
             if title:
                 lines.append(f"→ See also: {meta['flag']} {meta['display']}: {title} — {url}")
             else:

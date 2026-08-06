@@ -31,6 +31,7 @@ from publishing.bluesky_poster import (  # noqa: E402
     post_to_bluesky,
     split_sentences,
 )
+from generation.slugify import build_opinion_url  # noqa: E402
 
 OPED_DIR = os.path.join(REPO_ROOT, "digests", "opinion")
 
@@ -100,8 +101,8 @@ def parse_oped(path: str) -> tuple[str, str, str, list[str]]:
     return persona_name, lens_short, title, sentences
 
 
-def post_url(slug: str, date_str: str) -> str:
-    return f"{SITE_BASE_URL}/opinion/{slug}/{date_str}"
+def post_url(slug: str, date_str: str, title: str) -> str:
+    return f"{SITE_BASE_URL}{build_opinion_url(slug, date_str, title)}"
 
 
 def compose_post(persona_name: str, title: str, sentences: list[str], url: str) -> str:
@@ -130,7 +131,7 @@ def compose_post(persona_name: str, title: str, sentences: list[str], url: str) 
 def run(date_str: str, dry_run: bool) -> None:
     slug, path = find_oped_file(date_str)
     persona_name, lens_short, title, sentences = parse_oped(path)
-    url = post_url(slug, date_str)
+    url = post_url(slug, date_str, title)
     post_text = compose_post(persona_name, title, sentences, url)
 
     if len(post_text) > POST_MAX_CHARS:

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getActiveCountries } from '@/lib/countries'
 import { searchDigests, formatDate } from '@/lib/digests'
+import { buildDigestUrl } from '@/lib/slugify'
 
 function highlight(text: string, query: string): string {
   if (!query.trim()) return text
@@ -100,7 +101,7 @@ export default async function SearchPage({
                 return (
                   <li key={`${result.country}-${result.date}`}>
                     <Link
-                      href={`/${result.country}/${result.date}`}
+                      href={buildDigestUrl(result.country, result.date, result.title)}
                       className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
                     >
                       <div className="flex items-center justify-between gap-4 flex-wrap mb-2">

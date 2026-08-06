@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getActiveCountries } from '@/lib/countries'
 import { getCountryDigests } from '@/lib/digests'
 import { getAllOpeds } from '@/lib/oped'
+import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 
 export const revalidate = 300
 
@@ -27,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       countries.map(async (c) => {
         const digests = await getCountryDigests(c.slug)
         return digests.map((d) => ({
-          url: `${BASE}/${c.slug}/${d.date}`,
+          url: `${BASE}${buildDigestUrl(c.slug, d.date, d.title)}`,
           lastModified: new Date(d.date),
           changeFrequency: 'daily' as const,
           priority: 0.8,
@@ -38,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const opeds = await getAllOpeds()
   const opedEntries: MetadataRoute.Sitemap = opeds.map((o) => ({
-    url: `${BASE}/opinion/${o.slug}/${o.date}`,
+    url: `${BASE}${buildOpinionUrl(o.slug, o.date, o.title)}`,
     lastModified: new Date(o.date),
     changeFrequency: 'monthly' as const,
     priority: 0.6,

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { Country } from '@/lib/countries'
 import type { DigestContent } from '@/lib/digests'
 import { formatDate } from '@/lib/digests'
+import { buildDigestUrl } from '@/lib/slugify'
 
 export interface HeroItem {
   country: Country
@@ -65,7 +66,7 @@ export default function HeroRotator({ items }: { items: HeroItem[] }) {
               {formatDate(item.content.date)}
             </p>
             <Link
-              href={`/${item.country.slug}/${item.content.date}`}
+              href={buildDigestUrl(item.country.slug, item.content.date, item.title)}
               className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-3 transition-colors"
             >
               Read Today&apos;s Digest →
@@ -111,7 +112,7 @@ export default function HeroRotator({ items }: { items: HeroItem[] }) {
               {formatDate(item.content.date)}
             </p>
             <Link
-              href={`/${item.country.slug}/${item.content.date}`}
+              href={buildDigestUrl(item.country.slug, item.content.date, item.title)}
               className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-6 py-3 transition-colors"
             >
               Read Today&apos;s Digest →

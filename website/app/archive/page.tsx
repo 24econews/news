@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getCountry } from '@/lib/countries'
 import { getAllDigests, formatDate, type DigestMeta } from '@/lib/digests'
+import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 50
 
@@ -68,7 +69,7 @@ export default async function ArchivePage({
                     return (
                       <li key={`${entry.country}-${date}`}>
                         <Link
-                          href={`/${entry.country}/${date}`}
+                          href={buildDigestUrl(entry.country, date, entry.title)}
                           className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-sm transition-all group"
                         >
                           <span className="text-xl shrink-0">{countryInfo?.flag}</span>

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllOpeds, extractOpedExcerpt } from '@/lib/oped'
 import { formatDate } from '@/lib/digests'
+import { buildOpinionUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 20
 
@@ -62,7 +63,7 @@ export default async function OpinionPage({
               return (
                 <Link
                   key={`${oped.slug}-${oped.date}`}
-                  href={`/opinion/${oped.slug}/${oped.date}`}
+                  href={buildOpinionUrl(oped.slug, oped.date, oped.title)}
                   className="block bg-white rounded-xl border border-slate-200 p-5 sm:p-6 hover:border-slate-400 hover:shadow-sm transition-all group"
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-3">

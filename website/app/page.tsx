@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { countries, getActiveCountries, type Country } from '@/lib/countries'
 import { getCountryDigests, getDigest, formatDate, extractTeaser, type DigestContent } from '@/lib/digests'
 import { getAllOpeds, extractOpedExcerpt } from '@/lib/oped'
+import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 import HeroRotator from '@/components/HeroRotator'
 import NewsletterSignup from '@/components/NewsletterSignup'
 
@@ -89,7 +90,7 @@ export default async function HomePage() {
                   </p>
                 )}
                 <Link
-                  href={`/${c.slug}/${content.date}`}
+                  href={buildDigestUrl(c.slug, content.date, title)}
                   className="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"
                 >
                   Read Analysis →
@@ -116,7 +117,7 @@ export default async function HomePage() {
                 return (
                   <Link
                     key={`${oped.slug}-${oped.date}`}
-                    href={`/opinion/${oped.slug}/${oped.date}`}
+                    href={buildOpinionUrl(oped.slug, oped.date, oped.title)}
                     className="block border border-slate-200 bg-white p-6 hover:border-slate-400 hover:shadow-sm transition-all group"
                   >
                     <div className="flex flex-wrap items-center gap-2 mb-3">

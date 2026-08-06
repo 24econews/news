@@ -3,20 +3,35 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getAllOpeds, getOpedBySlugAndDate, extractOpedExcerpt } from '@/lib/oped'
 import { formatDate } from '@/lib/digests'
+import { buildOpinionUrl } from '@/lib/slugify'
 
 const BASE = 'https://24econews.com'
 
+// The dateSlug URL segment is "YYYY-MM-DD" (old plain-date pattern) or
+// "YYYY-MM-DD-title-slug" (new pattern, see lib/slugify.ts). Only the leading
+// date is ever used to look up content — the suffix is cosmetic/SEO only, so
+// a stale or mistyped slug still resolves the right piece instead of 404ing.
+function extractDate(dateSlug: string): string | null {
+  const match = dateSlug.match(/^(\d{4}-\d{2}-\d{2})(?:-|$)/)
+  return match ? match[1] : null
+}
+
 export async function generateStaticParams() {
   const opeds = await getAllOpeds()
-  return opeds.map((o) => ({ slug: o.slug, date: o.date }))
+  return opeds.map((o) => {
+    const url = buildOpinionUrl(o.slug, o.date, o.title)
+    return { slug: o.slug, dateSlug: url.split('/').pop()! }
+  })
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string; date: string }>
+  params: Promise<{ slug: string; dateSlug: string }>
 }): Promise<Metadata> {
-  const { slug, date } = await params
+  const { slug, dateSlug } = await params
+  const date = extractDate(dateSlug)
+  if (!date) return {}
   const oped = await getOpedBySlugAndDate(slug, date)
   if (!oped) return {}
   return {
@@ -28,9 +43,11 @@ export async function generateMetadata({
 export default async function OpedPage({
   params,
 }: {
-  params: Promise<{ slug: string; date: string }>
+  params: Promise<{ slug: string; dateSlug: string }>
 }) {
-  const { slug, date } = await params
+  const { slug, dateSlug } = await params
+  const date = extractDate(dateSlug)
+  if (!date) notFound()
 
   // Returns null both when the file is missing and when its date is still
   // in the future (see isPublished() in lib/oped.ts) — either way, 404.
@@ -51,7 +68,7 @@ export default async function OpedPage({
     author: { '@type': 'Person', name: oped.personaName },
     publisher: { '@type': 'Organization', name: '24EcoNews' },
     description,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/opinion/${oped.slug}/${oped.date}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}${buildOpinionUrl(oped.slug, oped.date, oped.title)}` },
   }
 
   return (

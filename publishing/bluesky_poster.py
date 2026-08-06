@@ -15,6 +15,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, REPO_ROOT)
+
+from generation.slugify import build_digest_url  # noqa: E402
 
 POST_MAX_CHARS = 300
 SITE_BASE_URL = "https://24econews.com"
@@ -119,15 +122,15 @@ def fit_teaser(sentences: list[str], available_chars: int) -> str:
     return truncated + "…"
 
 
-def post_url(country: str, date_str: str) -> str:
-    return f"{SITE_BASE_URL}/{country}/{date_str}"
+def post_url(country: str, date_str: str, title: str) -> str:
+    return f"{SITE_BASE_URL}{build_digest_url(country, date_str, title)}"
 
 
 def compose_post(country: str, date_str: str, title: str, sentences: list[str]) -> str:
     """Compose the post text. The title is never truncated — if space is tight,
     the teaser is shortened (down to omitted entirely) instead."""
     flag = FLAGS[country]
-    url = post_url(country, date_str)
+    url = post_url(country, date_str, title)
     header = f"{flag} {title}"
     footer = f"📰 {url}"
 
@@ -238,7 +241,7 @@ def run(country: str, date_str: str, dry_run: bool) -> None:
     path = digest_path(country, date_str)
     title, sentences = parse_digest(path)
     post_text = compose_post(country, date_str, title, sentences)
-    url = post_url(country, date_str)
+    url = post_url(country, date_str, title)
 
     if len(post_text) > POST_MAX_CHARS:
         raise ValueError(

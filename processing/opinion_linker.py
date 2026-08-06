@@ -20,6 +20,7 @@ from generation.oped_builder import (  # noqa: E402
     _strip_oped_body,
     infer_primary_country,
 )
+from generation.slugify import build_opinion_url  # noqa: E402
 from processing.cross_linker import COUNTRY_META  # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -98,7 +99,7 @@ def _strip_existing_related_opinion(content: str) -> str:
 
 
 def _build_related_opinion_block(oped: dict) -> str:
-    url = f"/opinion/{oped['slug']}/{oped['date']}"
+    url = build_opinion_url(oped["slug"], oped["date"], oped["title"])
     byline = f"By {oped['persona_name']} — {oped['lens_short']}" if oped["lens_short"] else f"By {oped['persona_name']}"
     return f"\n---\n## Related Opinion\n\n[{oped['title']}]({url})\n{byline}\n"
 

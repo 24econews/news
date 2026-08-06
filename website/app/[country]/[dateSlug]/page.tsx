@@ -2,16 +2,27 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getCountry, getActiveCountries } from '@/lib/countries'
 import { getDigest, getCountryDigests, extractTeaser } from '@/lib/digests'
+import { buildDigestUrl } from '@/lib/slugify'
 import DigestViewer from '@/components/DigestViewer'
 
 const BASE = 'https://24econews.com'
 
+// The dateSlug URL segment is "YYYY-MM-DD" (old plain-date pattern) or
+// "YYYY-MM-DD-title-slug" (new pattern, see lib/slugify.ts). Only the leading
+// date is ever used to look up content — the suffix is cosmetic/SEO only, so
+// a stale or mistyped slug still resolves the right digest instead of 404ing.
+function extractDate(dateSlug: string): string | null {
+  const match = dateSlug.match(/^(\d{4}-\d{2}-\d{2})(?:-|$)/)
+  return match ? match[1] : null
+}
+
 export async function generateStaticParams() {
-  const params: { country: string; date: string }[] = []
+  const params: { country: string; dateSlug: string }[] = []
   for (const country of getActiveCountries()) {
     const digests = await getCountryDigests(country.slug)
     for (const digest of digests) {
-      params.push({ country: country.slug, date: digest.date })
+      const url = buildDigestUrl(country.slug, digest.date, digest.title)
+      params.push({ country: country.slug, dateSlug: url.split('/').pop()! })
     }
   }
   return params
@@ -20,9 +31,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ country: string; date: string }>
+  params: Promise<{ country: string; dateSlug: string }>
 }): Promise<Metadata> {
-  const { country, date } = await params
+  const { country, dateSlug } = await params
+  const date = extractDate(dateSlug)
+  if (!date) return {}
   const digest = await getDigest(country, date)
   if (!digest) return {}
   return {
@@ -35,12 +48,15 @@ export async function generateMetadata({
 export default async function DigestPage({
   params,
 }: {
-  params: Promise<{ country: string; date: string }>
+  params: Promise<{ country: string; dateSlug: string }>
 }) {
-  const { country: countrySlug, date } = await params
+  const { country: countrySlug, dateSlug } = await params
 
   const countryInfo = getCountry(countrySlug)
   if (!countryInfo || !countryInfo.active) notFound()
+
+  const date = extractDate(dateSlug)
+  if (!date) notFound()
 
   const digest = await getDigest(countrySlug, date)
   if (!digest) notFound()
@@ -56,7 +72,7 @@ export default async function DigestPage({
     publisher: { '@type': 'Organization', name: '24EcoNews' },
     ...(digest.image_url ? { image: digest.image_url } : {}),
     description: extractTeaser(digest.rawContent) || digest.firstHeadline,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/${countrySlug}/${date}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}${buildDigestUrl(countrySlug, date, digest.title)}` },
   }
 
   return (
