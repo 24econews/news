@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { getAllOpeds, getOpedBySlugAndDate, extractOpedExcerpt } from '@/lib/oped'
 import { formatDate } from '@/lib/digests'
 import { buildOpinionUrl } from '@/lib/slugify'
-import BlueskyShareButton from '@/components/BlueskyShareButton'
+import ShareBar from '@/components/ShareBar'
 
 const BASE = 'https://24econews.com'
 
@@ -123,9 +123,10 @@ export default async function OpedPage({
             <span className="text-slate-400"> · </span>
             <span>{oped.lensShort}</span>
           </p>
-          <p className="text-xs text-slate-400 mb-4">{formatDate(oped.date)}</p>
-          <BlueskyShareButton text={oped.title} url={canonicalUrl} />
+          <p className="text-xs text-slate-400">{formatDate(oped.date)}</p>
         </div>
+
+        <ShareBar title={oped.title} canonicalUrl={canonicalUrl} label="Share this op-ed" />
 
         <div className="prose prose-slate max-w-none">
           {oped.paragraphs.map((p, i) => (
