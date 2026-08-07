@@ -1,8 +1,13 @@
-"""Post a published OpEd piece's teaser to Bluesky.
+"""Post the day's published OpEd piece(s) teaser to Bluesky.
 
 Reuses bluesky_poster.py's session/facet/posting plumbing — only the
 digest-specific parsing and post composition differ, since OpEd pieces
 live in digests/opinion/{slug}_{date}.md rather than a per-country digest.
+
+Usually there's exactly one OpEd per date, but more than one is legitimate
+(e.g. a date-gated launch piece whose reveal date coincides with that day's
+regular rotation pick) — all matches are posted, staggered STAGGER_SECONDS
+apart, same pattern as post_all_countries_bluesky.py uses for digests.
 """
 
 import argparse
@@ -11,6 +16,7 @@ import logging
 import os
 import re
 import sys
+import time
 from datetime import date
 
 logging.basicConfig(
@@ -34,25 +40,28 @@ from publishing.bluesky_poster import (  # noqa: E402
 from generation.slugify import build_opinion_url  # noqa: E402
 
 OPED_DIR = os.path.join(REPO_ROOT, "digests", "opinion")
+STAGGER_SECONDS = 1800
 
 
-def find_oped_file(date_str: str) -> tuple[str, str]:
-    """Return (slug, path) for the single OpEd published on date_str.
+def find_oped_files(date_str: str) -> list[tuple[str, str]]:
+    """Return [(slug, path), ...] for every OpEd published on date_str, sorted by slug.
 
-    Raises if zero or more than one file matches — either is a pipeline
-    error (nothing scheduled that day, or an ambiguous duplicate) that
-    should stop the post rather than guess.
+    More than one match is legitimate — e.g. a date-gated launch piece whose
+    reveal date happens to land on the same day as that day's regular
+    rotation-selected piece — so all matches are posted (see run()), not
+    treated as an ambiguity error. Only zero matches is a pipeline error
+    (nothing scheduled that day).
     """
     matches = sorted(glob.glob(os.path.join(OPED_DIR, f"*_{date_str}.md")))
     if not matches:
         raise FileNotFoundError(f"No OpEd file found for {date_str} in {OPED_DIR}")
-    if len(matches) > 1:
-        raise ValueError(f"Multiple OpEd files found for {date_str}: {matches!r} — ambiguous")
 
-    path = matches[0]
-    filename = os.path.basename(path)
-    slug = filename[: -(len(date_str) + len(".md") + 1)]  # strip "_{date}.md"
-    return slug, path
+    results = []
+    for path in matches:
+        filename = os.path.basename(path)
+        slug = filename[: -(len(date_str) + len(".md") + 1)]  # strip "_{date}.md"
+        results.append((slug, path))
+    return results
 
 
 def parse_oped(path: str) -> tuple[str, str, str, list[str]]:
@@ -128,8 +137,7 @@ def compose_post(persona_name: str, title: str, sentences: list[str], url: str) 
     return f"{header}\n\n{teaser}\n\n{footer}"
 
 
-def run(date_str: str, dry_run: bool) -> None:
-    slug, path = find_oped_file(date_str)
+def post_one(slug: str, path: str, date_str: str, dry_run: bool) -> None:
     persona_name, lens_short, title, sentences = parse_oped(path)
     url = post_url(slug, date_str, title)
     post_text = compose_post(persona_name, title, sentences, url)
@@ -159,6 +167,33 @@ def run(date_str: str, dry_run: bool) -> None:
     posted_url = post_to_bluesky(post_text, url)
     logger.info(f"[opinion/{slug}] Posted successfully: {posted_url}")
     print(f"Posted: {posted_url}")
+
+
+def run(date_str: str, dry_run: bool) -> None:
+    opeds = find_oped_files(date_str)
+    if len(opeds) > 1:
+        slugs = ", ".join(slug for slug, _ in opeds)
+        logger.info(
+            f"Found {len(opeds)} OpEd pieces for {date_str} ({slugs}) — "
+            f"posting all, staggered {STAGGER_SECONDS}s apart"
+        )
+
+    failed = []
+    for i, (slug, path) in enumerate(opeds):
+        try:
+            post_one(slug, path, date_str, dry_run)
+        except Exception as exc:
+            logger.error(f"[opinion/{slug}] Failed to post: {exc}")
+            print(f"ERROR: [opinion/{slug}] {exc}", file=sys.stderr)
+            failed.append(slug)
+
+        is_last = i == len(opeds) - 1
+        if not is_last and not dry_run:
+            logger.info(f"Waiting {STAGGER_SECONDS}s before next OpEd post…")
+            time.sleep(STAGGER_SECONDS)
+
+    if failed:
+        raise RuntimeError(f"Failed to post {len(failed)}/{len(opeds)} OpEd piece(s): {', '.join(failed)}")
 
 
 if __name__ == "__main__":
