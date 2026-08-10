@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
             value: "24econews.vercel.app",
           },
         ],
-        destination: "https://24econews.com/:path*",
+        destination: "https://www.24econews.com/:path*",
         permanent: true,
       },
     ];

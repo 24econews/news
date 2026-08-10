@@ -6,7 +6,7 @@ import { getCountryDigests, formatDate } from '@/lib/digests'
 import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 10
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 
 export async function generateStaticParams() {
   return getActiveCountries().map((c) => ({ country: c.slug }))

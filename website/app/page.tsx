@@ -7,7 +7,7 @@ import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 import HeroRotator from '@/components/HeroRotator'
 import NewsletterSignup from '@/components/NewsletterSignup'
 
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 
 const SITE_TITLE = '24EcoNews — Global Economic Intelligence'
 const SITE_DESCRIPTION =

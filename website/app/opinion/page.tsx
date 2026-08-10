@@ -6,7 +6,7 @@ import { buildOpinionUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 20
 
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 const PAGE_TITLE = 'Opinion | 24EcoNews'
 const PAGE_DESCRIPTION =
   '24EcoNews Opinion features five recurring columnists offering distinct editorial perspectives on Mercosur affairs.'

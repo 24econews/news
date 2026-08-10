@@ -20,7 +20,7 @@ sys.path.insert(0, REPO_ROOT)
 from generation.slugify import build_digest_url  # noqa: E402
 
 POST_MAX_CHARS = 300
-SITE_BASE_URL = "https://24econews.com"
+SITE_BASE_URL = "https://www.24econews.com"
 BLUESKY_API_BASE = "https://bsky.social/xrpc"
 
 COUNTRY_OUTPUT_DIRS = {

@@ -6,7 +6,7 @@ import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 
 export const revalidate = 300
 
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const countries = getActiveCountries()

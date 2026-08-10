@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/digests'
 import { buildOpinionUrl } from '@/lib/slugify'
 import ShareBar from '@/components/ShareBar'
 
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 
 // The dateSlug URL segment is "YYYY-MM-DD" (old plain-date pattern) or
 // "YYYY-MM-DD-title-slug" (new pattern, see lib/slugify.ts). Only the leading

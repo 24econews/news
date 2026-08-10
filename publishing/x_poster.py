@@ -20,7 +20,7 @@ sys.path.insert(0, REPO_ROOT)
 from generation.slugify import build_digest_url  # noqa: E402
 
 TWEET_MAX_CHARS = 280
-SITE_BASE_URL = "https://24econews.com"
+SITE_BASE_URL = "https://www.24econews.com"
 
 COUNTRY_OUTPUT_DIRS = {
     "argentina": "digests/",

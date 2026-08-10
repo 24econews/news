@@ -6,7 +6,7 @@ import { buildDigestUrl } from '@/lib/slugify'
 
 const PAGE_SIZE = 50
 
-const BASE = 'https://24econews.com'
+const BASE = 'https://www.24econews.com'
 
 export const metadata: Metadata = {
   title: 'Archive | 24EcoNews',
