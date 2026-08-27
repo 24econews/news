@@ -1,0 +1,28 @@
+> PERSONA: Diego Restrepo
+> LENS: Techno-optimist / critical of hype
+> TITLE: U.S. weaponizes Pix dispute; Brazil must defend with data, not nationalism.
+> DATE: 2026-08-27
+
+Argentina's credit crisis has claimed five economy ministers in living memory. Bolivia just burned through one in a week over diesel prices. Brazil is watching Braskem restructure $10.9 billion in liabilities while a petrochemical company loses market share it may never recover. These are all real crises, and they're dominating the headlines for obvious reasons.
+
+But the most genuinely contestable technology story this week — the one where reasonable people looking at the same facts reach opposite conclusions — is buried in a footnote of the Brazil-U.S. trade dispute: Washington has cited Pix as a justification for tariffs on Brazilian exports.
+
+Let that sink in. The United States government is treating a real-time payment rail — one of the most successful fintech deployments in the developing world, with over 200 million registered keys and transaction volumes that have made Brazil's payment infrastructure the envy of central bankers from Jakarta to Lagos — as a trade barrier. And Brazil's government, under political pressure to show toughness with Washington ahead of October elections, is calling the claim "unfounded."
+
+Both sides are partially right. And that is exactly the problem.
+
+Pix is genuinely exceptional technology. Launched by the Banco Central do Brasil in November 2020, it processed over 60 billion transactions in 2024 alone, operates 24/7 at near-zero cost to users, and achieved mass adoption faster than any comparable system in the Western Hemisphere. For a techno-optimist, it is the case study that disproves the claim that financial inclusion requires the private sector to lead. The BCB built something that Visa, Mastercard, and the American fintech lobby could not, and would not, because free instant payments do not generate interchange revenue. That is precisely what Washington objects to.
+
+The U.S. tariff rationale, per reporting from Brazil Journal and Valor Econômico, groups Pix alongside Brazilian ethanol and forced labor concerns as justifications for the broader tariff package Lula contested in his call with Trump. The ethical categories being collapsed here are extraordinary: a payment system that has banked millions of previously unbanked Brazilians is being equated, at least rhetorically, with supply chain violations. This is not serious trade policy analysis. It is negotiating leverage dressed up as principle. American card networks and digital payment processors — whose lobbying footprint in Washington is not difficult to trace — have obvious commercial interests in slowing the adoption of zero-fee interoperable infrastructure in a market of 215 million people.
+
+But here is where I have to puncture the Brazilian triumphalism, because the "Pix is perfect" narrative papers over real regulatory gaps the BCB has been slow to address. Pix fraud has grown substantially since deployment, with the central bank itself acknowledging the system's open architecture has been exploited for scams, social engineering attacks, and money laundering at a scale that earlier instant payment systems in the UK and India also confronted. Brazil has implemented some corrective measures — transaction limits for new devices, overnight restrictions — but the regulatory framework around Pix liability, consumer recourse, and anti-money laundering obligations still lags the system's velocity. When Washington claims Pix distorts competition, the right response is not "the claim is unfounded." The right response is to demonstrate, with data and regulatory transparency, that Pix meets international standards for financial integrity and market access — and to fix the gaps where it does not.
+
+The meeting scheduled between Minister Márcio Elias Rosa and U.S. Trade Representative Jamieson Greer is the first concrete diplomatic step, and it matters more than the heated rhetoric around it. Brazil's leverage in this negotiation is real: the Mercosur-EU agreement creates alternative market access that reduces U.S. leverage, and Canada's growing urgency to deepen ties with the bloc adds further geopolitical pressure on Washington. But leverage only converts into outcomes when your technical arguments are airtight. Right now, Brazil is defending Pix with political language at a moment when the conversation demands regulatory sophistication.
+
+The broader stakes extend well beyond Brazil's bilateral trade balance. If the precedent holds that a government-built payment infrastructure can be designated a trade barrier simply because it does not generate fees for American networks, then every central bank in Latin America, Africa, and Southeast Asia considering a similar deployment has to run the political calculus of U.S. retaliation. India's UPI, already facing scrutiny in trade conversations with Washington, is watching this dispute closely. So is the European Central Bank as it advances the digital euro. The architecture of global financial infrastructure is being contested in what looks, on the surface, like an argument about Brazilian tariffs.
+
+Pix deserves defending. But it deserves defending with precision, transparency on fraud metrics, and a willingness to close genuine regulatory gaps — not with the reflexive nationalism that Brazilian electoral politics currently incentivizes. The BCB built something genuinely excellent. The government should prove it, not just assert it.
+
+---
+
+*Diego Restrepo is one of 24EcoNews's eight recurring opinion columnists, each representing a distinct editorial perspective on Mercosur affairs.*
