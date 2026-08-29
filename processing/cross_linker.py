@@ -51,8 +51,13 @@ def _strip_existing_cross_refs(content: str) -> str:
     return content
 
 
-def _build_cross_ref_block(country: str, connections: list, date: str) -> str:
-    """Return the ## Related Coverage markdown block for a country, or '' if none."""
+def _build_cross_ref_block(country: str, connections: list, date: str, title_key: str = "titles") -> str:
+    """Return the ## Related Coverage markdown block for a country, or '' if none.
+
+    title_key selects which language's titles to use for the "See also" anchor
+    text — "titles" (native-language, for .md output) or "en_titles" (English,
+    for .en.md output, falling back to native if no translation exists yet).
+    """
     relevant = [c for c in connections if country in c.get("countries", [])]
     if not relevant:
         return ""
@@ -68,7 +73,7 @@ def _build_cross_ref_block(country: str, connections: list, date: str) -> str:
             lines.append(summary)
         for other in others:
             meta = COUNTRY_META[other]
-            title = conn.get("titles", {}).get(other, "")
+            title = conn.get(title_key, {}).get(other, "")
             url = build_digest_url(other, date, title)
             if title:
                 lines.append(f"→ See also: {meta['flag']} {meta['display']}: {title} — {url}")
@@ -92,6 +97,7 @@ def cross_link_digests(
     # Step a: Read digests
     narratives: dict = {}
     titles: dict = {}
+    en_titles: dict = {}
 
     for country in countries:
         if country not in COUNTRY_META:
@@ -104,6 +110,14 @@ def cross_link_digests(
             content = f.read()
         narratives[country] = _strip_existing_cross_refs(content)
         titles[country] = _extract_title(content)
+
+        en_path = path[:-3] + ".en.md"
+        en_title = ""
+        if os.path.exists(en_path):
+            with open(en_path, encoding="utf-8") as f:
+                en_title = _extract_title(f.read())
+        en_titles[country] = en_title or titles[country]
+
         logger.info(f"[cross_linker] Loaded {country} digest ({len(content):,} chars)")
 
     if len(narratives) < 2:
@@ -155,6 +169,7 @@ def cross_link_digests(
     # Attach digest titles so "See also" lines can include them
     for conn in connections:
         conn["titles"] = {c: titles.get(c, "") for c in conn.get("countries", [])}
+        conn["en_titles"] = {c: en_titles.get(c, "") for c in conn.get("countries", [])}
 
     logger.info(f"[cross_linker] {len(connections)} connection(s) found")
 
@@ -162,15 +177,16 @@ def cross_link_digests(
     affected: set = set()
 
     for country in narratives:
-        block = _build_cross_ref_block(country, connections, date)
-        if not block:
+        native_block = _build_cross_ref_block(country, connections, date, title_key="titles")
+        en_block = _build_cross_ref_block(country, connections, date, title_key="en_titles")
+        if not native_block and not en_block:
             continue
 
         md_path = _digest_path(digests_base_dir, country, date)
         en_path = md_path[:-3] + ".en.md"
 
-        for path in (md_path, en_path):
-            if not os.path.exists(path):
+        for path, block in ((md_path, native_block), (en_path, en_block)):
+            if not block or not os.path.exists(path):
                 continue
             with open(path, encoding="utf-8") as f:
                 content = f.read()
