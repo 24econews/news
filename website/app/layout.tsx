@@ -35,6 +35,7 @@ const organizationJsonLd = {
   sameAs: [
     'https://bsky.app/profile/24econews.bsky.social',
     'https://buttondown.com/24econews',
+    'https://24econews.substack.com',
   ],
 }
 
