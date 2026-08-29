@@ -104,11 +104,18 @@ After the narrative, if the articles contain significant corporate news — M&A 
 
 Rules for this section:
 - Maximum 3 items
-- Each item: bold company name with exchange and ticker in parentheses, then an em dash, then 1-2 sentences maximum
+- Format each company as its own sub-heading, followed by 1-2 sentences maximum. Do NOT write company names as bolded text inline within a paragraph or list — each company must be a distinct, extractable unit. Example:
+
+### Petrobras (B3: PETR4)
+[1-2 sentence update]
+
+### Casas Bahia (B3: BHIA3)
+[1-2 sentence update]
+
+- Sub-heading format: "### Company Name (Exchange: TICKER)" — list every exchange the company trades on if more than one, e.g. "### Braskem (NYSE: BAK / B3: BRKM5)"
 - Tone: Bloomberg Markets brief — factual, precise, no editorializing
 - Make global significance explicit in every item (international listings, cross-border deals, commodity exposure, etc.)
-- Format: **Company Name (NYSE: XYZ)** — Sentence one. Sentence two if needed.
-- Write the content in {language}, but keep "## Corporate Watch" as the section header in English
+- Write the 1-2 sentence update in {language}, but keep "## Corporate Watch" as the section header in English, and keep each "### Company Name (Exchange: TICKER)" sub-heading unmodified — company names and tickers are not translated
 - If there are no significant corporate stories today, omit this entire section — do NOT force it
 
 ---
