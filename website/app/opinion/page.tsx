@@ -9,7 +9,7 @@ const PAGE_SIZE = 20
 const BASE = 'https://www.24econews.com'
 const PAGE_TITLE = 'Opinion | 24EcoNews'
 const PAGE_DESCRIPTION =
-  '24EcoNews Opinion features five recurring columnists offering distinct editorial perspectives on Mercosur affairs.'
+  '24EcoNews Opinion features eight recurring columnists offering distinct editorial perspectives on Mercosur affairs.'
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -62,7 +62,7 @@ export default async function OpinionPage({
           24EcoNews Opinion
         </h1>
         <p className="text-slate-500 max-w-2xl leading-relaxed">
-          24EcoNews Opinion features five recurring columnists offering distinct editorial
+          24EcoNews Opinion features eight recurring columnists offering distinct editorial
           perspectives on Mercosur affairs. These pieces represent the views of their authors,
           not 24EcoNews&apos;s news reporting.
         </p>
