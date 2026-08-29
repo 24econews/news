@@ -3,6 +3,7 @@
 import logging
 import os
 import random
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
 
@@ -10,6 +11,20 @@ logger = logging.getLogger(__name__)
 
 _STOP_WORDS = {"the", "a", "an", "as", "in", "of", "by", "to", "and", "or", "for", "on", "at"}
 _UNSPLASH_URL = "https://api.unsplash.com/search/photos"
+
+# Unsplash's "regular" size variant defaults to 1080px wide — below Google's
+# 1200px recommendation for large-image search previews/Discover eligibility.
+# Re-requesting the same variant at 1200px only adds ~25% to the file size
+# (measured ~124KB -> ~151KB on a sample photo), well short of "full" (the
+# native-resolution variant, which runs several MB and is unusable as a hero image).
+_HERO_IMAGE_WIDTH = 1200
+
+
+def _resized(url: str, width: int) -> str:
+    parts = urlsplit(url)
+    query = dict(parse_qsl(parts.query))
+    query["w"] = str(width)
+    return urlunsplit(parts._replace(query=urlencode(query)))
 
 
 def _build_query(title: str, country: str) -> str:
@@ -63,7 +78,7 @@ def fetch_hero_image(query: str, country: str) -> dict | None:
 
     photo = random.choice(results)
     return {
-        "url": photo["urls"]["regular"],
+        "url": _resized(photo["urls"]["regular"], _HERO_IMAGE_WIDTH),
         "thumb": photo["urls"]["thumb"],
         "photographer": photo["user"]["name"],
         "photographer_url": photo["user"]["links"]["html"],
