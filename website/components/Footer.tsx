@@ -21,6 +21,14 @@ export default function Footer() {
             <Link href="/about" className="hover:text-slate-900 transition-colors">About</Link>
             <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>
             <Link href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</Link>
+            <a
+              href="https://bsky.app/profile/24econews.bsky.social"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 transition-colors"
+            >
+              Follow us on Bluesky
+            </a>
             <CookieSettingsButton />
           </div>
         </div>

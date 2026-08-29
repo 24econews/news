@@ -7,6 +7,7 @@ import { buildDigestUrl } from '@/lib/slugify'
 export const metadata: Metadata = {
   title: 'Search | 24EcoNews',
   description: 'Search across all 24EcoNews economic digests by keyword or country.',
+  robots: { index: false, follow: true },
 }
 
 function highlight(text: string, query: string): string {

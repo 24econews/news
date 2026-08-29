@@ -16,12 +16,36 @@ export const metadata: Metadata = {
   other: {
     'google-adsense-account': 'ca-pub-7161273140151755',
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+    },
+  },
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsMediaOrganization',
+  name: '24EcoNews',
+  url: 'https://www.24econews.com',
+  sameAs: [
+    'https://bsky.app/profile/24econews.bsky.social',
+    'https://buttondown.com/24econews',
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={geist.variable}>
       <body className="min-h-screen flex flex-col bg-white font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }}
+        />
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7161273140151755"
