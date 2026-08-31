@@ -194,3 +194,4 @@ jobs:
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: |
           python publishing/oped_bluesky_poster.py
+# Scheduler resync Mon Aug 31 15:57:24 CEST 2026
