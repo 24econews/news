@@ -1,8 +1,6 @@
 name: Daily Economy Digest
 
 on:
-  schedule:
-    - cron: '0 10 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -128,8 +126,7 @@ jobs:
       # would then fall on next week's exclusive lower bound too — silently
       # and permanently dropped from every Opinion Roundup.
       - name: Generate Weekly Briefing
-        if: github.event_name == 'schedule' &&
-            steps.check_day.outputs.is_friday == 'true'
+        if: steps.check_day.outputs.is_friday == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
@@ -194,4 +191,3 @@ jobs:
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: |
           python publishing/oped_bluesky_poster.py
-# Scheduler resync Mon Aug 31 15:57:24 CEST 2026
