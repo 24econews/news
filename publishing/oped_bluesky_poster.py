@@ -12,6 +12,7 @@ apart, same pattern as post_all_countries_bluesky.py uses for digests.
 
 import argparse
 import glob
+import json
 import logging
 import os
 import re
@@ -38,8 +39,10 @@ from publishing.bluesky_poster import (  # noqa: E402
     split_sentences,
 )
 from generation.slugify import build_opinion_url  # noqa: E402
+from generation.oped_personas import PERSONAS_BY_SLUG  # noqa: E402
 
 OPED_DIR = os.path.join(REPO_ROOT, "digests", "opinion")
+SPECIAL_MANIFEST_DIR = os.path.join(REPO_ROOT, "digests", "special")
 STAGGER_SECONDS = 1800
 
 
@@ -110,6 +113,25 @@ def parse_oped(path: str) -> tuple[str, str, str, list[str]]:
     return persona_name, lens_short, title, sentences
 
 
+def load_special_basenames() -> set[str]:
+    """Return the basenames of every opinion file listed in any
+    digests/special/*.json manifest — pieces that belong to a special
+    edition (see special_editions.py) the editor pushes out deliberately as
+    a batch, not the daily rotation pick this poster normally handles.
+    Posting all 8 automatically, staggered 30 minutes apart like a normal
+    day's single piece, is exactly the mishandling this skip exists to stop.
+    """
+    basenames = set()
+    if not os.path.isdir(SPECIAL_MANIFEST_DIR):
+        return basenames
+    for manifest_path in glob.glob(os.path.join(SPECIAL_MANIFEST_DIR, "*.json")):
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        for piece in manifest.get("pieces", []):
+            basenames.add(os.path.basename(piece["path"]))
+    return basenames
+
+
 def post_url(slug: str, date_str: str, title: str) -> str:
     return f"{SITE_BASE_URL}{build_opinion_url(slug, date_str, title)}"
 
@@ -169,8 +191,34 @@ def post_one(slug: str, path: str, date_str: str, dry_run: bool) -> None:
     print(f"Posted: {posted_url}")
 
 
-def run(date_str: str, dry_run: bool) -> None:
+def run(date_str: str, dry_run: bool, include_special: bool, persona_slug: str | None) -> None:
+    if persona_slug and not include_special:
+        raise ValueError("--persona only applies together with --include-special.")
+
     opeds = find_oped_files(date_str)
+    special_basenames = load_special_basenames()
+
+    if include_special:
+        if not persona_slug:
+            raise ValueError("--include-special requires --persona <slug> to pick exactly one piece from the special edition.")
+        opeds = [(slug, path) for slug, path in opeds if slug == persona_slug]
+        if not opeds:
+            raise FileNotFoundError(f"No OpEd file found for {date_str} matching --persona {persona_slug!r}")
+    else:
+        eligible = [(slug, path) for slug, path in opeds if os.path.basename(path) not in special_basenames]
+        skipped = len(opeds) - len(eligible)
+        if skipped:
+            logger.info(
+                f"Skipping {skipped} special-edition piece(s) for {date_str} — they're part of a "
+                "digests/special/*.json manifest; rerun with --include-special --persona <slug> to post one deliberately."
+            )
+        opeds = eligible
+        if not opeds:
+            raise FileNotFoundError(
+                f"No eligible OpEd file found for {date_str} in {OPED_DIR} — all matches are part of a "
+                "special edition (use --include-special --persona <slug> to post one)."
+            )
+
     if len(opeds) > 1:
         slugs = ", ".join(slug for slug, _ in opeds)
         logger.info(
@@ -200,10 +248,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Post a published OpEd piece's teaser to Bluesky.")
     parser.add_argument("--date", default=date.today().isoformat(), help="YYYY-MM-DD, defaults to today")
     parser.add_argument("--dry-run", action="store_true", help="Compose and print the post without posting")
+    parser.add_argument(
+        "--include-special", action="store_true",
+        help="Allow posting a piece that's part of a digests/special/*.json manifest — requires --persona to pick exactly one",
+    )
+    parser.add_argument(
+        "--persona", default=None, choices=sorted(PERSONAS_BY_SLUG),
+        help="Required with --include-special: which persona's piece to post",
+    )
     args = parser.parse_args()
 
     try:
-        run(args.date, args.dry_run)
+        run(args.date, args.dry_run, args.include_special, args.persona)
     except Exception as exc:
         logger.error(f"Failed to post OpEd for {args.date}: {exc}")
         print(f"ERROR: {exc}", file=sys.stderr)

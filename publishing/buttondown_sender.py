@@ -120,14 +120,15 @@ def create_email(subject: str, body: str, api_key: str, status: str) -> dict:
     return response.json()
 
 
-def run(week_arg: str | None, dry_run: bool, test_send: bool, confirm_live_send: bool) -> None:
+def run(week_arg: str | None, file_arg: str | None, dry_run: bool, test_send: bool, confirm_live_send: bool) -> None:
     if test_send and confirm_live_send:
         raise ValueError("--test-send and --confirm-live-send are mutually exclusive — pick one.")
+    if file_arg and week_arg:
+        raise ValueError("--file and --week are mutually exclusive — pick one.")
 
-    friday = friday_of_week(week_arg)
-    path = briefing_path(friday)
+    path = file_arg if file_arg else briefing_path(friday_of_week(week_arg))
 
-    logger.info(f"Reading weekly briefing: {path}")
+    logger.info(f"Reading newsletter file: {path}")
     subject, greeting, body = parse_briefing(path)
     body = append_subscribe_block(body)
 
@@ -168,8 +169,9 @@ def run(week_arg: str | None, dry_run: bool, test_send: bool, confirm_live_send:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Send the Mercosur Weekly Briefing via Buttondown.")
+    parser = argparse.ArgumentParser(description="Send the Mercosur Weekly Briefing (or an arbitrary newsletter file) via Buttondown.")
     parser.add_argument("--week", default=None, help="Monday (YYYY-MM-DD) of the week to send; defaults to this week")
+    parser.add_argument("--file", default=None, help="Path to an arbitrary newsletter markdown file to send instead of the weekly briefing (mutually exclusive with --week)")
     parser.add_argument("--dry-run", action="store_true", help="Preview the email without calling the Buttondown API")
     parser.add_argument(
         "--test-send", action="store_true",
@@ -184,7 +186,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        run(args.week, args.dry_run, args.test_send, args.confirm_live_send)
+        run(args.week, args.file, args.dry_run, args.test_send, args.confirm_live_send)
     except Exception as exc:
         logger.error(f"Newsletter send failed: {exc}")
         print(f"ERROR: {exc}", file=sys.stderr)

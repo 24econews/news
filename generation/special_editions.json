@@ -1,0 +1,43 @@
+{
+  "brazil-2026-r1": {
+    "publish_date": "2026-10-14",
+    "lookback_start": "2026-10-04",
+    "topic_pending": false,
+    "topic": "The first round of Brazil's October 4, 2026 presidential election and the October 25, 2026 runoff. Cover what the first-round result means for fiscal policy, interest rates, trade, markets, and governability — and lay out what each of the two possible runoff outcomes could mean for the economy. The runoff outcome is UNKNOWN as of this writing: write in scenario terms about both possible winners, and never assert, predict, or assume who wins.",
+    "scenario_instruction": "The October 25, 2026 runoff outcome is UNKNOWN. Do not predict, assert, or assume a winner, and do not hedge by implying one outcome is more likely than the other unless the source material itself states that. Give each of the two plausible outcomes ONE short paragraph — what each candidate's platform and the first-round result imply for the economy under that scenario — grounded only in what the source material below actually shows. Do not write a full symmetric side-by-side scenario analysis; this is a column, not a matrix.",
+    "allowed_facts": [
+      "October 4",
+      "October 25"
+    ],
+    "angles": {
+      "ricardo-almeida": "Fiscal anchor and reform agenda: what the first-round result means for the primary surplus, the debt trajectory, and the odds that fiscal reform actually clears the next Congress, under each runoff scenario.",
+      "camila-duarte": "Social programs and distribution: what the result means for Bolsa Família, social spending commitments, and distributive policy continuity or reversal, under each runoff scenario.",
+      "eduardo-ferraz": "Institutions, Congress and governability: coalition math, the composition of the next Congress, and whether the next government can actually govern, under each runoff scenario.",
+      "lucia-ibarra": "Mercosur and regional sovereignty: what the result means for Mercosur integration, regional trade policy, and Brazil's posture toward US and IMF conditionality, under each runoff scenario.",
+      "henrique-salgado": "US-China-Brazil geopolitics: how the result shifts Brazil's great-power positioning, trade alignment, and strategic leverage between Washington and Beijing, under each runoff scenario.",
+      "mariana-coelho": "Agribusiness and trade: what the result means for agricultural policy, export competitiveness, and farm-sector investment, under each runoff scenario.",
+      "diego-restrepo": "Fintech, Pix, AI and tech regulation: what the result means for Pix, digital-banking regulation, and tech-sector policy continuity, under each runoff scenario.",
+      "sofia-andrade": "Oil, mining, Petrobras and energy policy: what the result means for Petrobras governance, energy policy, and resource-sector investment, under each runoff scenario."
+    }
+  },
+  "brazil-2026-r2": {
+    "publish_date": "2026-10-28",
+    "lookback_start": "2026-10-25",
+    "topic_pending": true,
+    "topic": "TODO — NOT YET WRITABLE: the October 25, 2026 runoff result is not known as of this config being written. Once the result is confirmed, replace this entire string with: the actual runoff winner, the margin, and what the composition and mandate of the incoming government means for fiscal policy, interest rates, trade, markets, and the broader economic outlook heading into 2027. 'allowed_facts' is for dates only (see rule in special_editions.py) — do not add names to it. Do NOT run real (non-dry-run) generation for this edition until this topic text is replaced with the actual outcome and 'topic_pending' below is set to false.",
+    "scenario_instruction": "",
+    "allowed_facts": [
+      "October 25"
+    ],
+    "angles": {
+      "ricardo-almeida": "Fiscal anchor and reform agenda: what the actual runoff result and the new government's mandate mean for the primary surplus, the debt trajectory, and the odds of fiscal reform actually passing the next Congress.",
+      "camila-duarte": "Social programs and distribution: what the new government means for Bolsa Família, social spending commitments, and distributive policy continuity or reversal.",
+      "eduardo-ferraz": "Institutions, Congress and governability: coalition math, the new Congress's composition, and whether the new government can actually govern.",
+      "lucia-ibarra": "Mercosur and regional sovereignty: what the new government means for Mercosur integration, regional trade policy, and Brazil's posture toward US and IMF conditionality.",
+      "henrique-salgado": "US-China-Brazil geopolitics: how the result shifts Brazil's great-power positioning, trade alignment, and strategic leverage between Washington and Beijing.",
+      "mariana-coelho": "Agribusiness and trade: what the new government means for agricultural policy, export competitiveness, and farm-sector investment.",
+      "diego-restrepo": "Fintech, Pix, AI and tech regulation: what the new government means for Pix, digital-banking regulation, and tech-sector policy continuity.",
+      "sofia-andrade": "Oil, mining, Petrobras and energy policy: what the new government means for Petrobras governance, energy policy, and resource-sector investment."
+    }
+  }
+}
