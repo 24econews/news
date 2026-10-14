@@ -1,6 +1,8 @@
 """Generate the Mercosur Weekly Briefing from the week's daily digests."""
 
 import argparse
+import glob
+import json
 import logging
 import os
 import re
@@ -24,6 +26,7 @@ sys.path.insert(0, REPO_ROOT)
 from generation.slugify import build_digest_url, build_opinion_url  # noqa: E402
 
 OPED_DIR = os.path.join(REPO_ROOT, "digests", "opinion")
+SPECIAL_MANIFEST_DIR = os.path.join(REPO_ROOT, "digests", "special")
 
 COUNTRY_ORDER = ["brazil", "argentina", "chile", "uruguay", "paraguay", "bolivia"]
 
@@ -40,25 +43,37 @@ WEEKLY_OUTPUT_DIR = os.path.join(REPO_ROOT, "digests", "weekly")
 
 MODEL = "claude-sonnet-4-6"
 
-EDITOR_INSTRUCTIONS = """You are the editor of 24EcoNews, a weekly economic briefing covering the Mercosur region for a global audience of investors, analysts, and business professionals.
+EDITOR_INSTRUCTIONS_TEMPLATE = """You are the editor of 24EcoNews, a weekly economic briefing covering the Mercosur region for a global audience of investors, analysts, and business professionals.
 
 Below are this week's daily digest narratives for 6 countries: Argentina, Brazil, Chile, Uruguay, Paraguay and Bolivia — with MULTIPLE dated digests provided per country (Monday through Friday, whichever days exist), each with its own URL. Also below, in OPED DATA, are any Opinion columns published since last week's briefing.
 
 Write a Mercosur Weekly Briefing with this structure:
 
 ---
-Before the main content, write a short 1-2 sentence email greeting that feels personal and editorial — as if written by the editor introducing this week's briefing to a subscriber. It should set the tone for what's inside without repeating the Big Picture content. Vary the opening style week to week (don't always start with "Good morning"). Examples of tone (write an original one, don't reuse these):
+Before the main content, write a short 1-2 sentence email greeting that feels personal and editorial — as if written by the editor introducing this week's briefing to a subscriber. It should set the tone for what's inside without repeating the Big Picture content.
+{recent_openings_block}
+Do NOT begin the greeting with any of: "Rarely", "Seldom", "Few weeks", "This week", or the pattern "[Adverb] does a single week..." (e.g. "Rarely does a single week..."). These openings have been overused and will be rejected.
 
-- "This week Mercosur delivered a masterclass in contradiction — bold reforms paired with mounting fiscal strain."
-- "Six countries, one currency regime abandoned, and a growing sense that the region's reform momentum is outrunning its fiscal cushion. Here's what mattered this week."
-- "From Bolivia's historic currency shift to Chile's fifth straight month of contraction, this week tested the region's resilience. Here's your briefing."
+To vary the opening, pick ONE of the following devices — choose whichever fits this week's content best, and make sure it differs from whatever device the recent openings above relied on:
+- A concrete number or data point from this week's coverage
+- A single vivid image or scene
+- A short question
+- A very short declarative sentence, followed by a longer one
+- A direct contrast between two countries
+- A quoted phrase pulled from this week's coverage
+
+If you use the number/data-point device: the number AND the specific claim it describes must appear TOGETHER, as stated, in the DATA section below for this week. Never construct your own count, tally, or aggregate across countries, institutions, or time (e.g., "X officials have lost their jobs this year/in recent memory/in living memory") unless the DATA explicitly states that exact count. A single fact pulled directly from one line of the DATA ("unemployment hit 9.5%", "copper closed at $6.51/lb") is correct; a number you computed or estimated yourself is not, no matter how plausible it sounds.
+
+Bad example (fabricated historical aggregate — never do this): "Five finance ministers have lost their jobs to reform pressure in this region in living memory." Nothing in the DATA counts ministerial dismissals across countries or years — this number was invented, and sentences like it will be rejected.
+
+If you use the quoted-phrase device, the quote must be copied verbatim from the DATA section — never fabricate or paraphrase a quote. If no sufficiently strong grounded number or quote exists this week, pick a different device from the list instead.
 
 After the greeting sentences, on their own line, add a signature:
 
 — John Dominguez, Editor
 
 Example format:
-"This week Mercosur delivered a masterclass in contradiction — bold reforms paired with mounting fiscal strain.
+"Chile's unemployment rate just hit a five-year high. So did its copper exports.
 
 — John Dominguez, Editor"
 
@@ -107,6 +122,10 @@ If pieces are listed in the OPED DATA section below, list each one here in this 
 [One sentence summary or hook capturing the piece's core argument, based on its excerpt in OPED DATA]
 [Link to the piece, using its exact URL from OPED DATA]
 
+If an OPED DATA entry is marked "SPECIAL EDITION" (collapsed — several columnists wrote on one shared subject), do NOT use the per-piece format above and do NOT list its pieces individually. Write exactly one line for it instead, in this format, using its given count and URL:
+
+**[N] columnists weigh in on this week's special edition** — [Read all N on the Opinion page](URL)
+
 If OPED DATA below has no pieces, omit this "## Opinion This Week" section entirely — do not include the header with no content beneath it, and do not write a note saying no pieces were published.
 
 ## What to Watch Next Week
@@ -119,6 +138,128 @@ Tone: Bloomberg Markets meets The Economist. Authoritative, specific, globally r
 Use only the exact URLs given in the DATA and OPED DATA sections below for any link — never invent or alter one.
 
 Output only the briefing itself, starting directly with the email greeting. Do not include any preamble, meta-commentary, or introductory sentence like "Here is this week's briefing" before the greeting, and do not wrap the output in a leading "---" separator. Do not include a top-level title or headline line anywhere — start with the greeting and end with "What to Watch Next Week"."""
+
+BANNED_OPENER_RE = re.compile(
+    r"^(Rarely|Seldom|Few\s+weeks|This\s+week)\b|^\w+\s+does\s+a\s+single\s+week",
+    re.IGNORECASE,
+)
+
+# Catches the specific fabricated-aggregate failure mode (e.g. "Five ministers have
+# lost their jobs ... in living memory") that slipped past the prompt-level ban on
+# invented historical/regional tallies.
+UNGROUNDED_TIMEFRAME_RE = re.compile(r"living memory|recent memory", re.IGNORECASE)
+
+GREETING_RECENT_LOOKBACK = 6
+
+
+def _strip_greeting_signature(text: str) -> str:
+    """Return the greeting opening (everything before the '— John Dominguez'
+    signature line), ignoring any leading HTML comment line."""
+    lines = text.split("\n")
+    i = 0
+    while i < len(lines) and lines[i].strip().startswith("<!--"):
+        i += 1
+    sig_idx = next(
+        (j for j in range(i, len(lines)) if lines[j].strip().startswith("— John Dominguez")),
+        None,
+    )
+    if sig_idx is None:
+        sig_idx = next((j for j in range(i, len(lines)) if lines[j].strip().startswith("#")), len(lines))
+    return " ".join(ln.strip() for ln in lines[i:sig_idx] if ln.strip())
+
+
+def _first_word(text: str) -> str:
+    match = re.search(r"[A-Za-z']+", text)
+    return match.group(0).lower() if match else ""
+
+
+def collect_recent_greetings(before: date, n: int = GREETING_RECENT_LOOKBACK) -> list[str]:
+    """Return up to n greeting openings from the most recent saved briefings
+    dated before `before`, most recent first."""
+    dated = []
+    for path in glob.glob(os.path.join(WEEKLY_OUTPUT_DIR, "briefing_*.md")):
+        match = re.search(r"briefing_(\d{4}-\d{2}-\d{2})\.md$", path)
+        if not match:
+            continue
+        d = date.fromisoformat(match.group(1))
+        if d < before:
+            dated.append((d, path))
+    dated.sort(key=lambda t: t[0], reverse=True)
+
+    greetings = []
+    for _, path in dated[:n]:
+        with open(path, encoding="utf-8") as f:
+            greeting = _strip_greeting_signature(f.read())
+        if greeting:
+            greetings.append(greeting)
+    return greetings
+
+
+def build_editor_instructions(recent_greetings: list[str]) -> str:
+    if recent_greetings:
+        quoted = "\n".join(f'- "{g}"' for g in recent_greetings)
+        recent_openings_block = (
+            "\nRecent openings (do NOT reuse their first word, sentence structure, or rhetorical device):\n"
+            f"{quoted}\n"
+        )
+    else:
+        recent_openings_block = ""
+    return EDITOR_INSTRUCTIONS_TEMPLATE.format(recent_openings_block=recent_openings_block)
+
+
+def regenerate_greeting(data_section: str, recent_greetings: list[str], conflict_reason: str) -> str:
+    """Ask Sonnet for a replacement greeting when the generated one collides
+    with a recent opening or a banned pattern. Grounded against the same raw
+    DATA FOR THIS WEEK section used for the main generation (not the model's
+    own Big Picture synthesis), so any number or quote it uses is verifiable
+    against the source digests. Returns a 'greeting\\n\\n— John Dominguez,
+    Editor' block to splice in place of the original."""
+    import anthropic
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise EnvironmentError("ANTHROPIC_API_KEY is not set. Add it to your .env file.")
+
+    quoted = "\n".join(f'- "{g}"' for g in recent_greetings) if recent_greetings else "(none)"
+
+    prompt = (
+        "You are the editor of 24EcoNews, a weekly Mercosur economic briefing. Write a "
+        "replacement 1-2 sentence email greeting for this week's briefing, followed by the "
+        "signature line '— John Dominguez, Editor' on its own line.\n\n"
+        f"Your previous attempt {conflict_reason} — it must not be reused.\n\n"
+        "Recent openings (do NOT reuse their first word, sentence structure, or rhetorical device):\n"
+        f"{quoted}\n\n"
+        "Do NOT begin with any of: \"Rarely\", \"Seldom\", \"Few weeks\", \"This week\", or the "
+        "pattern \"[Adverb] does a single week...\".\n\n"
+        "Pick ONE device that differs from the recent openings above: a concrete number or data "
+        "point, a single vivid image or scene, a short question, a very short declarative sentence "
+        "followed by a longer one, a direct contrast between two countries, or a quoted phrase from "
+        "this week's coverage.\n\n"
+        "If you use the number/data-point device: the number AND the specific claim it describes "
+        "must appear TOGETHER, as stated, in the DATA below for this week. Never construct your own "
+        "count, tally, or aggregate across countries, institutions, or time (e.g., \"X officials have "
+        "lost their jobs this year/in recent memory/in living memory\") unless the DATA explicitly "
+        "states that exact count. A single fact pulled directly from one line of the DATA is correct; "
+        "a number you computed or estimated yourself is not, no matter how plausible it sounds.\n\n"
+        "Bad example (fabricated historical aggregate — never do this): \"Five finance ministers have "
+        "lost their jobs to reform pressure in this region in living memory.\" Nothing in the DATA "
+        "counts ministerial dismissals across countries or years — this number was invented.\n\n"
+        "If you use the quoted-phrase device, the quote must be copied verbatim from the DATA below — "
+        "never fabricate or paraphrase a quote. If no sufficiently strong grounded number or quote "
+        "exists this week, pick a different device from the list instead.\n\n"
+        "This week's source data, for grounding:\n" + data_section + "\n\n"
+        "Output ONLY the greeting followed by the signature line, nothing else."
+    )
+
+    client = anthropic.Anthropic(api_key=api_key)
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=200,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return response.content[0].text.strip()
 
 
 def monday_of_week(week_arg: str | None) -> date:
@@ -198,18 +339,44 @@ def gather_week(week_days: list[date]) -> dict:
     return results
 
 
+def load_special_edition_basenames() -> dict[str, str]:
+    """Return {opinion-file basename: edition id} for every piece listed in
+    any digests/special/*.json manifest, so the weekly roundup can collapse
+    a special edition's pieces into one line instead of listing all 8
+    individually (see gather_recent_opeds)."""
+    mapping = {}
+    if not os.path.isdir(SPECIAL_MANIFEST_DIR):
+        return mapping
+    for manifest_path in sorted(glob.glob(os.path.join(SPECIAL_MANIFEST_DIR, "*.json"))):
+        edition_id = os.path.splitext(os.path.basename(manifest_path))[0]
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        for piece in manifest.get("pieces", []):
+            mapping[os.path.basename(piece["path"])] = edition_id
+    return mapping
+
+
 def gather_recent_opeds(since_day: date, until_day: date) -> list[dict]:
     """Return OpEd pieces published in (since_day, until_day], most recent first.
 
     Reuses oped_bluesky_poster.py's parse_oped() for the PERSONA/LENS/TITLE
     metadata extraction and body-sentence splitting, rather than re-implementing
     that parsing a third time.
+
+    Pieces belonging to a special edition (digests/special/*.json) are not
+    added individually — they'd otherwise fill the roundup with 8 near-identical
+    entries on the same subject. Instead each edition encountered this week
+    collapses into a single "special" entry pointing at the /opinion page;
+    see build_data_section() for how that entry is rendered for the model.
     """
     if not os.path.isdir(OPED_DIR):
         return []
 
+    special_basenames = load_special_edition_basenames()
     filename_re = re.compile(r"^([a-z-]+)_(\d{4}-\d{2}-\d{2})\.md$")
     results = []
+    special_counts: dict[str, dict] = {}  # edition_id -> {"count": int, "date": str}
+
     for fname in os.listdir(OPED_DIR):
         match = filename_re.match(fname)
         if not match:
@@ -217,6 +384,14 @@ def gather_recent_opeds(since_day: date, until_day: date) -> list[dict]:
         slug, date_str = match.group(1), match.group(2)
         oped_date = date.fromisoformat(date_str)
         if not (since_day < oped_date <= until_day):
+            continue
+
+        edition_id = special_basenames.get(fname)
+        if edition_id:
+            entry = special_counts.setdefault(edition_id, {"count": 0, "date": date_str})
+            entry["count"] += 1
+            entry["date"] = max(entry["date"], date_str)
+            logger.info(f"[weekly_briefing] {fname} is part of special edition {edition_id!r} — collapsing into one roundup line")
             continue
 
         path = os.path.join(OPED_DIR, fname)
@@ -237,6 +412,15 @@ def gather_recent_opeds(since_day: date, until_day: date) -> list[dict]:
         })
         logger.info(f"[weekly_briefing] Including OpEd {slug}_{date_str} in roundup")
 
+    for edition_id, entry in special_counts.items():
+        results.append({
+            "special": True,
+            "edition": edition_id,
+            "count": entry["count"],
+            "date": entry["date"],
+            "url": f"{SITE_BASE_URL}/opinion",
+        })
+
     results.sort(key=lambda o: o["date"], reverse=True)
     return results
 
@@ -245,7 +429,7 @@ def _day_display(d: date) -> str:
     return d.strftime("%A, %B %-d") if os.name != "nt" else d.strftime("%A, %B %d")
 
 
-def build_prompt(country_data: dict, oped_pieces: list[dict]) -> str:
+def build_data_section(country_data: dict, oped_pieces: list[dict]) -> str:
     data_blocks = ["\n\n---\nDATA FOR THIS WEEK:\n"]
     for country in COUNTRY_ORDER:
         digests = country_data.get(country) or []
@@ -270,6 +454,12 @@ def build_prompt(country_data: dict, oped_pieces: list[dict]) -> str:
     data_blocks.append("\n\n---\nOPED DATA (Opinion pieces published since last week's briefing):\n")
     if oped_pieces:
         for oped in oped_pieces:
+            if oped.get("special"):
+                data_blocks.append(
+                    f"\n### SPECIAL EDITION — {oped['count']} pieces ({oped['date']}) — COLLAPSE INTO ONE LINE, do not list individually\n"
+                    f"URL: {oped['url']}\n"
+                )
+                continue
             data_blocks.append(
                 f"\n### {oped['persona_name']} — {oped['lens_short']} ({oped['date']})\n"
                 f"TITLE: {oped['title']}\n"
@@ -279,7 +469,7 @@ def build_prompt(country_data: dict, oped_pieces: list[dict]) -> str:
     else:
         data_blocks.append("\n(No OpEd pieces were published since last week's briefing — omit the Opinion This Week section entirely.)\n")
 
-    return EDITOR_INSTRUCTIONS + "\n".join(data_blocks)
+    return "\n".join(data_blocks)
 
 
 def generate_briefing(prompt: str) -> str:
@@ -426,7 +616,11 @@ def run(week_arg: str | None, dry_run: bool) -> None:
 
     oped_pieces = gather_recent_opeds(last_friday, friday)
 
-    prompt = build_prompt(country_data, oped_pieces)
+    recent_greetings = collect_recent_greetings(friday)
+    recent_first_words = {_first_word(g) for g in recent_greetings}
+
+    data_section = build_data_section(country_data, oped_pieces)
+    prompt = build_editor_instructions(recent_greetings) + data_section
 
     logger.info("Generating weekly briefing via Claude Sonnet…")
     body = generate_briefing(prompt)
@@ -442,6 +636,24 @@ def run(week_arg: str | None, dry_run: bool) -> None:
         raise ValueError("Could not find '## The Big Picture' in the generated briefing — cannot assemble the headline/date header")
     greeting = body[:idx].strip()
     rest = body[idx:].strip()
+
+    def _opening_conflict(opening: str) -> str | None:
+        word = _first_word(opening)
+        if BANNED_OPENER_RE.match(opening.strip()):
+            return f"opened with a banned pattern (\"{opening.strip()[:40]}...\")"
+        if UNGROUNDED_TIMEFRAME_RE.search(opening):
+            return "used an ungrounded cross-time framing (\"living memory\"/\"recent memory\")"
+        if word and word in recent_first_words:
+            return f"opened with the word \"{word}\", matching a recent briefing's opening word"
+        return None
+
+    conflict = _opening_conflict(_strip_greeting_signature(greeting))
+    if conflict:
+        logger.warning(f"Greeting {conflict} — regenerating once.")
+        greeting = regenerate_greeting(data_section, recent_greetings, conflict)
+        new_conflict = _opening_conflict(_strip_greeting_signature(greeting))
+        if new_conflict:
+            logger.warning(f"Regenerated greeting still {new_conflict} — proceeding anyway.")
 
     briefing = f"{greeting}\n\n# {headline}\n\n*{send_date_display}*\n\n{rest}"
 
