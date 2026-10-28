@@ -63,7 +63,7 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 # Upper bound on top of the "about 60 words" target in build_intro() — a
 # little slack for the count word's length, not a license to drift further.
 INTRO_MAX_WORDS = 65
-INTRO_MAX_SENTENCES = 2
+INTRO_MAX_SENTENCES = 3
 
 TEASER_MAX_WORDS = 35
 TEASER_MIN_SENTENCES = 1
@@ -96,32 +96,37 @@ def call_to_action(count: int) -> str:
     )
 
 
-def build_subject(count: int) -> str:
-    """Fixed, non-generated subject line — only the piece count varies."""
+def build_subject(count: int, edition: dict) -> str:
+    """Fixed, non-generated subject line, templated per-edition in
+    generation/special_editions.json (key: newsletter_subject) with a
+    {count_word} placeholder — only the piece count varies."""
     word = _NUMBER_WORDS.get(count, str(count))
-    return f"Brazil's runoff: {word} columnists on what the first round means for the economy"
+    return edition["newsletter_subject"].format(count_word=word)
 
 
-def build_intro(count: int) -> str:
-    """Fixed, non-generated intro — describes only what the edition
-    contains (the first-round result and what the runoff could change),
+def build_intro(count: int, edition: dict) -> str:
+    """Fixed, non-generated intro, templated per-edition in
+    generation/special_editions.json (key: newsletter_intro) with a
+    {count_word} placeholder — describes only what the edition contains,
     never what a candidate said, avoided, or promised. Enforced at most
     INTRO_MAX_SENTENCES sentences and INTRO_MAX_WORDS words below, since
     this text is static copy and should never silently drift past its
-    own budget after an edit."""
+    own budget after an edit.
+
+    The budget applies only to the first paragraph (the promotional
+    summary this guard exists to keep from drifting). A second paragraph,
+    separated by a blank line — e.g. an editor's note on late-breaking
+    developments — is exact verbatim copy dictated by events, not prone
+    to the same drift, so it's exempt from the word/sentence cap."""
     word = _NUMBER_WORDS.get(count, str(count))
-    intro = (
-        f"This special edition brings together {word} columns, each from a different 24EcoNews "
-        "columnist, on what Brazil's October 4 first-round election result means for the economy. "
-        "Together, they examine what the October 25 runoff could still change — from fiscal policy "
-        "and social spending to trade, geopolitics, and the country's broader economic direction."
-    )
-    sentence_count = len(SENTENCE_SPLIT_RE.split(intro.strip()))
-    word_count = len(intro.split())
+    intro = edition["newsletter_intro"].format(count_word=word)
+    first_paragraph = intro.split("\n\n", 1)[0]
+    sentence_count = len(SENTENCE_SPLIT_RE.split(first_paragraph.strip()))
+    word_count = len(first_paragraph.split())
     if sentence_count > INTRO_MAX_SENTENCES:
-        raise AssertionError(f"Intro has {sentence_count} sentences, exceeds the {INTRO_MAX_SENTENCES}-sentence budget: {intro!r}")
+        raise AssertionError(f"Intro's first paragraph has {sentence_count} sentences, exceeds the {INTRO_MAX_SENTENCES}-sentence budget: {first_paragraph!r}")
     if word_count > INTRO_MAX_WORDS:
-        raise AssertionError(f"Intro has {word_count} words, exceeds the {INTRO_MAX_WORDS}-word budget: {intro!r}")
+        raise AssertionError(f"Intro's first paragraph has {word_count} words, exceeds the {INTRO_MAX_WORDS}-word budget: {first_paragraph!r}")
     return intro
 
 
@@ -241,8 +246,8 @@ Write a teaser for a newsletter, following this exact format — all requirement
 
 - Exactly one or two sentences, {max_words} words total at most.
 - Must begin with exactly "{surname} {verb} that" — this verb has already been chosen for you; do not substitute a different one.
-- State the piece's central claim, restated closely in your own words. Do not introduce any claim, framing, or figure beyond what the piece itself states, and only use a figure if the piece states it in that same context.
-- If you refer to the R$250 billion fiscal figure, call it "R$250 billion in adjustment" — do not say "spending cuts" or "cuts" unless the piece's own sentence stating that figure itself uses the word "cuts".
+- State the piece's central claim, restated closely in your own words. Do not introduce any claim, framing, or figure beyond what the piece itself states.
+- Do not use any digits anywhere in the teaser — no figures, percentages, amounts, or dates of any kind, even if the piece itself states them. Describe the claim qualitatively instead.
 - Do not make any claim about what a candidate has said, avoided, or planned unless the piece attributes it as settled fact rather than a hypothetical scenario.
 - Do not use quotation marks anywhere.
 - End on the open question the piece raises — draw the reader in without revealing the piece's conclusion. The teaser's final sentence must be that question, ending in "?".
@@ -278,23 +283,52 @@ def validate_teaser(teaser: str, surname_: str, verb: str, body: str) -> list[st
         violations.append("must end with a question mark")
     if len(sentences) >= 2 and any(s.strip().endswith("?") for s in sentences[:-1]):
         violations.append("only the final sentence may be a question — earlier sentence(s) must state the claim declaratively")
-    if re.search(r"\bspending cuts\b", teaser, re.IGNORECASE):
-        violations.append('says "spending cuts" — use "R$250 billion in adjustment" instead')
-    elif "cuts" in lowered and "cuts" not in body.lower():
+    if "cuts" in lowered and "cuts" not in body.lower():
         violations.append('uses "cuts", a word not present in the piece')
     return violations
 
 
 TEASER_MAX_ATTEMPTS = 5
 
+DIGIT_RE = re.compile(r"\d")
+
+
+def build_teaser_prompt(persona: str, title: str, body: str, verb: str) -> str:
+    extra_instruction = TEASER_PERSONA_NOTES.get(persona, "")
+    return TEASER_PROMPT_TEMPLATE.format(
+        persona=persona, surname=surname(persona), verb=verb, title=title, body=body,
+        max_words=TEASER_MAX_WORDS, extra_instruction=extra_instruction,
+    )
+
+
+def enforce_teaser_no_digits(teaser: str, persona: str, title: str, body: str, verb: str) -> str:
+    """Digits are never allowed in a teaser, whether it was just generated or
+    loaded from the saved teasers file: a single dedicated regeneration, then
+    a hard stop rather than the "use as-is, flag for review" fallback other
+    format violations get — a figure slipping into a teaser is exactly the
+    fabrication-adjacent risk this edition's digit ban exists to close off
+    entirely."""
+    if not DIGIT_RE.search(teaser):
+        return teaser
+    logger.warning(f"{persona}: teaser contains a digit — regenerating once")
+    prompt = build_teaser_prompt(persona, title, body, verb)
+    digit_correction = (
+        f"\n\nYour previous attempt contained a digit, which is not allowed under any circumstance: "
+        f"{teaser!r}\n\nRewrite the teaser with absolutely no digits anywhere — describe every figure, "
+        "percentage, amount, or date qualitatively instead. Follow every other requirement exactly as before."
+    )
+    teaser = _call_haiku(prompt + digit_correction, max_tokens=120)
+    if DIGIT_RE.search(teaser):
+        raise RuntimeError(
+            f"{persona}: teaser still contains a digit after regenerating once — aborting. "
+            f"Offending teaser: {teaser!r}"
+        )
+    return teaser
+
 
 def generate_teaser(persona: str, title: str, body: str, verb: str) -> str:
     surname_ = surname(persona)
-    extra_instruction = TEASER_PERSONA_NOTES.get(persona, "")
-    prompt = TEASER_PROMPT_TEMPLATE.format(
-        persona=persona, surname=surname_, verb=verb, title=title, body=body,
-        max_words=TEASER_MAX_WORDS, extra_instruction=extra_instruction,
-    )
+    prompt = build_teaser_prompt(persona, title, body, verb)
     teaser = _call_haiku(prompt, max_tokens=120)
     violations = validate_teaser(teaser, surname_, verb, body)
     attempt = 1
@@ -311,7 +345,71 @@ def generate_teaser(persona: str, title: str, body: str, verb: str) -> str:
         violations = validate_teaser(teaser, surname_, verb, body)
     if violations:
         logger.warning(f"{persona}: teaser still violates format after {attempt} attempts ({'; '.join(violations)}) — using as-is, flag for review")
-    return teaser
+
+    return enforce_teaser_no_digits(teaser, persona, title, body, verb)
+
+
+# --- Teaser persistence -------------------------------------------------
+#
+# Teasers are saved to disk (keyed by persona slug) so a run — dry or real —
+# reads the same fixed wording every time instead of re-generating (and
+# risking different phrasing) on every invocation. --regenerate-teasers is
+# the only path that calls the model and overwrites the file.
+
+
+def teasers_path(edition_id: str) -> str:
+    return os.path.join(SPECIAL_MANIFEST_DIR, f"teasers_{edition_id}.json")
+
+
+def save_teasers(edition_id: str, teasers: dict) -> str:
+    path = teasers_path(edition_id)
+    os.makedirs(SPECIAL_MANIFEST_DIR, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(teasers, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    return path
+
+
+def get_teasers(edition_id: str, pieces: list[dict], regenerate: bool) -> dict:
+    """Return {slug: teaser} for every piece. Generates fresh (and saves)
+    when `regenerate` is set or no teasers file exists yet; otherwise loads
+    the saved file and re-applies the digit check to its contents — a
+    teaser edited by hand after saving could reintroduce a digit, and that
+    check must hold regardless of where the teaser text came from."""
+    path = teasers_path(edition_id)
+    if regenerate or not os.path.exists(path):
+        teasers = {}
+        for i, p in enumerate(pieces):
+            verb = TEASER_VERBS[i % len(TEASER_VERBS)]
+            logger.info(f"Generating teaser for {p['persona']} (verb: {verb})…")
+            teaser = generate_teaser(p["persona"], p["title"], p["body"], verb)
+            _check_grounding(f"{p['persona']} teaser", teaser, p["body"])
+            teasers[p["slug"]] = teaser
+        save_teasers(edition_id, teasers)
+        logger.info(f"Teasers saved to {path}")
+        return teasers
+
+    with open(path, encoding="utf-8") as f:
+        teasers = json.load(f)
+    logger.info(f"Loaded teasers from {path}")
+
+    changed = False
+    for i, p in enumerate(pieces):
+        slug = p["slug"]
+        if slug not in teasers:
+            raise RuntimeError(
+                f"No teaser found for persona {p['persona']} ({slug}) in {path} — "
+                "run with --regenerate-teasers to rebuild the file."
+            )
+        verb = TEASER_VERBS[i % len(TEASER_VERBS)]
+        fixed = enforce_teaser_no_digits(teasers[slug], p["persona"], p["title"], p["body"], verb)
+        if fixed != teasers[slug]:
+            teasers[slug] = fixed
+            changed = True
+    if changed:
+        save_teasers(edition_id, teasers)
+        logger.info(f"Digit violation(s) fixed in loaded teasers — rewrote {path}")
+    return teasers
 
 
 def _significant_words(text: str) -> set[str]:
@@ -485,7 +583,10 @@ def assemble_newsletter(pieces: list[dict], subject: str, intro: str) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def run(edition_id: str, dry_run: bool) -> None:
+def run(edition_id: str, dry_run: bool, regenerate_teasers: bool = False) -> None:
+    editions = load_editions()
+    edition = get_edition(editions, edition_id)
+
     manifest_path = os.path.join(SPECIAL_MANIFEST_DIR, f"{edition_id}.json")
     manifest = load_manifest(edition_id)
     total = len(manifest.get("pieces", []))
@@ -501,15 +602,13 @@ def run(edition_id: str, dry_run: bool) -> None:
     if changed:
         logger.info(f"Refreshed {changed} stale manifest title(s) in {manifest_path}")
 
-    for i, p in enumerate(pieces):
-        verb = TEASER_VERBS[i % len(TEASER_VERBS)]
-        logger.info(f"Generating teaser for {p['persona']} (verb: {verb})…")
-        p["teaser"] = generate_teaser(p["persona"], p["title"], p["body"], verb)
-        _check_grounding(f"{p['persona']} teaser", p["teaser"], p["body"])
+    teasers = get_teasers(edition_id, pieces, regenerate_teasers)
+    for p in pieces:
+        p["teaser"] = teasers[p["slug"]]
 
     count = len(pieces)
-    subject = build_subject(count)
-    intro = build_intro(count)
+    subject = build_subject(count, edition)
+    intro = build_intro(count, edition)
 
     newsletter = assemble_newsletter(pieces, subject, intro)
     verify_call_to_action(newsletter, count)
@@ -552,10 +651,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build the newsletter for a special-edition OpEd series.")
     parser.add_argument("--edition", required=True, help="Edition id from generation/special_editions.json (e.g. brazil-2026-r1)")
     parser.add_argument("--dry-run", action="store_true", help="Generate and print the newsletter without writing digests/special/newsletter_<id>.md")
+    parser.add_argument("--regenerate-teasers", action="store_true", help="Rebuild teasers via the model and overwrite digests/special/teasers_<id>.json, instead of reading the saved file")
     args = parser.parse_args()
 
     try:
-        run(args.edition, args.dry_run)
+        run(args.edition, args.dry_run, args.regenerate_teasers)
     except Exception as exc:
         logger.error(f"Special-edition newsletter build failed: {exc}")
         print(f"ERROR: {exc}", file=sys.stderr)

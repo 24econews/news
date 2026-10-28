@@ -83,9 +83,10 @@ At least two-thirds of the piece must be economic analysis — fiscal, monetary,
 
 Absolutely not allowed, under any circumstance:
 - Telling readers how to vote, or endorsing or opposing any candidate or party.
-- Quotation marks around any statement attributed to a person, political party, ministry, company, or institution — even if the source material itself quotes them directly and even if the words would be accurate. Paraphrase the statement in your own words and attribute it to the reporting instead (e.g. "Valor Econômico reported that..." or "according to the digest coverage..."). Do not put anyone's words in quotation marks, period. A single word of your own scare-quoted for rhetorical effect (e.g. calling a plan "temporary") is fine — the ban is on quoting someone else's words, not on your own emphasis.
+- Quotation marks around any statement attributed to a person, political party, ministry, company, or institution — even if the source material itself quotes them directly and even if the words would be accurate. Paraphrase the statement in your own words and attribute it to the reporting instead (e.g. "Valor Econômico reported that..." or "according to press reports..."). Do not put anyone's words in quotation marks, period. A single word of your own scare-quoted for rhetorical effect (e.g. calling a plan "temporary") is fine — the ban is on quoting someone else's words, not on your own emphasis.
 - Any number, percentage, date, or figure that does not appear in the source material below.
 - Stating what any candidate or party plans, has promised, or will do unless the source material explicitly says so — frame it as a scenario instead (see above).
+- The words "source material" or "digest" (in any form — "digest coverage," "the digests," etc.) anywhere in your own column text. That phrasing is for your eyes only, describing what's fed to you below; it must never appear in the piece itself. Attribute facts to the reporting instead — "press reports said," "according to Valor Econômico," "Folha reported" — never to "the source material" or "the digest."
 
 Write with conviction and a clear point of view — this is opinion writing, not neutral reporting. Be willing to criticize your own 'side' when the facts warrant it; intellectual honesty matters more than ideological consistency.
 

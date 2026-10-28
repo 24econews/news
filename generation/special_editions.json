@@ -18,26 +18,37 @@
       "mariana-coelho": "Agribusiness and trade: what the result means for agricultural policy, export competitiveness, and farm-sector investment, under each runoff scenario.",
       "diego-restrepo": "Fintech, Pix, AI and tech regulation: what the result means for Pix, digital-banking regulation, and tech-sector policy continuity, under each runoff scenario.",
       "sofia-andrade": "Oil, mining, Petrobras and energy policy: what the result means for Petrobras governance, energy policy, and resource-sector investment, under each runoff scenario."
-    }
+    },
+    "newsletter_subject": "Brazil's runoff: {count_word} columnists on what the first round means for the economy",
+    "newsletter_intro": "This special edition brings together {count_word} columns, each from a different 24EcoNews columnist, on what Brazil's October 4 first-round election result means for the economy. Together, they examine what the October 25 runoff could still change — from fiscal policy and social spending to trade, geopolitics, and the country's broader economic direction."
   },
   "brazil-2026-r2": {
     "publish_date": "2026-10-28",
-    "lookback_start": "2026-10-25",
-    "topic_pending": true,
-    "topic": "TODO — NOT YET WRITABLE: the October 25, 2026 runoff result is not known as of this config being written. Once the result is confirmed, replace this entire string with: the actual runoff winner, the margin, and what the composition and mandate of the incoming government means for fiscal policy, interest rates, trade, markets, and the broader economic outlook heading into 2027. 'allowed_facts' is for dates only (see rule in special_editions.py) — do not add names to it. Do NOT run real (non-dry-run) generation for this edition until this topic text is replaced with the actual outcome and 'topic_pending' below is set to false.",
-    "scenario_instruction": "",
+    "lookback_start": "2026-10-19",
+    "topic_pending": false,
+    "topic": "The result of Brazil's October 25, 2026 presidential runoff, in which Lula won re-election with 51.79% of valid votes to Flávio Bolsonaro's 48.21%, a margin of 4,430,191 votes in the official TSE count, reversing the first-round result of October 4. Cover what the result means for fiscal policy, interest rates, trade, markets and governability, including the composition of Congress. Report the market reaction, any dispute of the result, and any statement by the government or opposition only as the source digests report them, attributed to the reporting. The outcome is final; anything about what the re-elected government will do is a scenario unless the sources say so.",
+    "scenario_instruction": "The runoff result is known: Lula won. Do not speculate about the government's intentions beyond what the sources state; frame any such claim explicitly as a scenario ('if the government pursues...'). Describe any dispute of the result only as reported, and note that the TSE's official count certifies the result.",
     "allowed_facts": [
-      "October 25"
+      "October 4",
+      "October 25",
+      "51.79%",
+      "48.21%",
+      "4,430,191",
+      "4.4 million",
+      "47.03%",
+      "45.16%"
     ],
     "angles": {
-      "ricardo-almeida": "Fiscal anchor and reform agenda: what the actual runoff result and the new government's mandate mean for the primary surplus, the debt trajectory, and the odds of fiscal reform actually passing the next Congress.",
-      "camila-duarte": "Social programs and distribution: what the new government means for Bolsa Família, social spending commitments, and distributive policy continuity or reversal.",
-      "eduardo-ferraz": "Institutions, Congress and governability: coalition math, the new Congress's composition, and whether the new government can actually govern.",
-      "lucia-ibarra": "Mercosur and regional sovereignty: what the new government means for Mercosur integration, regional trade policy, and Brazil's posture toward US and IMF conditionality.",
+      "ricardo-almeida": "Fiscal anchor and reform agenda: what the actual runoff result and the re-elected government's mandate mean for the primary surplus, the debt trajectory, and the odds of fiscal reform actually passing the next Congress.",
+      "camila-duarte": "Social programs and distribution: what the re-elected government means for Bolsa Família, social spending commitments, and distributive policy continuity or reversal.",
+      "eduardo-ferraz": "Institutions, Congress and governability: coalition math, the new Congress's composition, and whether the re-elected government can actually govern.",
+      "lucia-ibarra": "Mercosur and regional sovereignty: what the re-elected government means for Mercosur integration, regional trade policy, and Brazil's posture toward US and IMF conditionality.",
       "henrique-salgado": "US-China-Brazil geopolitics: how the result shifts Brazil's great-power positioning, trade alignment, and strategic leverage between Washington and Beijing.",
-      "mariana-coelho": "Agribusiness and trade: what the new government means for agricultural policy, export competitiveness, and farm-sector investment.",
-      "diego-restrepo": "Fintech, Pix, AI and tech regulation: what the new government means for Pix, digital-banking regulation, and tech-sector policy continuity.",
-      "sofia-andrade": "Oil, mining, Petrobras and energy policy: what the new government means for Petrobras governance, energy policy, and resource-sector investment."
-    }
+      "mariana-coelho": "Agribusiness and trade: what the re-elected government means for agricultural policy, export competitiveness, and farm-sector investment.",
+      "diego-restrepo": "Fintech, Pix, AI and tech regulation: what the re-elected government means for Pix, digital-banking regulation, and tech-sector policy continuity.",
+      "sofia-andrade": "Oil, mining, Petrobras and energy policy: what the re-elected government means for Petrobras governance, energy policy, and resource-sector investment."
+    },
+    "newsletter_subject": "Lula wins Brazil's runoff: {count_word} columnists on what it means for the economy",
+    "newsletter_intro": "This special edition brings together {count_word} columns, each from a different 24EcoNews columnist, on what Lula's victory in Brazil's October 25 runoff means for the economy. They cover fiscal policy and social spending, Congress, trade, geopolitics, and what markets and investors should watch next. The columns were written on October 27, after Monday's market sell-off.\n\nEditor's note: Later on October 27, Reuters and other outlets reported that Flávio Bolsonaro had left Brazil for the United States, where a State Department official said he and his family would receive visas. Argentine authorities said they had no record of him entering their country. This edition does not address those developments, which our daily coverage will follow."
   }
 }
