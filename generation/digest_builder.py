@@ -70,7 +70,14 @@ def build_narrative_digest(
 
     articles_text = _format_articles(articles)
 
-    user_prompt = f"""Based on the following news articles from {country_name} today, produce an economic and business report in two parts.
+    user_prompt = f"""Based on the following news articles from {country_name}, produce an economic and business report in two parts.
+
+Today's date is {date_str}. Each article below carries a PUBLISHED date.
+
+RECENCY RULE (critical):
+- Report as news only developments from the last few days. If an article's PUBLISHED date is noticeably older than {date_str}, do not present its contents as something that is happening now — either drop it, or if it provides necessary background, frame it explicitly as past context (e.g., "in October, the central bank had...") rather than as current news.
+- Whenever you cite a quarter, year, or figure (inflation rate, GDP, a deal value, etc.), label it with the year/period the source actually states (e.g., "Q3 2026 earnings," "2025 inflation of X%"). Never strip the year/quarter off a figure so it reads as if it were the latest one.
+- Never present an older statement, data point, or announcement as if it were a new development today.
 
 ---
 PART 1 — MAIN NARRATIVE (600-800 words, required):
@@ -172,6 +179,7 @@ def _format_articles(articles: List[Article]) -> str:
         content = article.full_summary or article.content or article.summary or ""
         parts.append(
             f"SOURCE: {article.source}\n"
+            f"PUBLISHED: {article.published_at.date().isoformat()}\n"
             f"HEADLINE: {article.title}\n"
             f"CONTENT: {content[:2000]}\n"
             "---"

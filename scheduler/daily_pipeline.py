@@ -213,8 +213,12 @@ def load_config(path: str) -> dict:
         return yaml.safe_load(f)
 
 
-def run_pipeline(country: str = "argentina") -> None:
-    """Execute the full pipeline: fetch → filter → store → publish → translate → push."""
+def run_pipeline(country: str = "argentina", force: bool = False) -> None:
+    """Execute the full pipeline: fetch → filter → store → publish → translate → push.
+
+    force: regenerate today's digest even if today's articles were already seen/stored
+    in a previous run (bypasses the known-URL dedup against the DB).
+    """
     if country not in COUNTRY_SETTINGS:
         raise ValueError(f"Unknown country '{country}'. Supported: {list(COUNTRY_SETTINGS)}")
 
@@ -251,9 +255,12 @@ def run_pipeline(country: str = "argentina") -> None:
         return
 
     # --- Deduplicate against DB ---
-    known_urls = get_known_urls(conn)
+    known_urls = set() if force else get_known_urls(conn)
     new_articles = [a for a in articles if a.url not in known_urls]
-    logger.info(f"New articles (not yet in DB): {len(new_articles)}/{len(articles)}")
+    if force:
+        logger.info(f"--force: skipping known-URL dedup — {len(new_articles)}/{len(articles)} articles considered new")
+    else:
+        logger.info(f"New articles (not yet in DB): {len(new_articles)}/{len(articles)}")
 
     if not new_articles:
         logger.info("No new articles to process today")
@@ -362,5 +369,10 @@ if __name__ == "__main__":
         choices=sorted(COUNTRY_SETTINGS),
         help="Country to run the pipeline for (default: argentina)",
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Regenerate today's digest even if today's articles were already seen in a previous run",
+    )
     args = parser.parse_args()
-    run_pipeline(country=args.country)
+    run_pipeline(country=args.country, force=args.force)
