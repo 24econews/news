@@ -1,4 +1,27 @@
 import { getActiveCountries } from './countries'
+import truncatedDigests from '@/data/truncated-digests.json'
+
+const TRUNCATED_DIGESTS = new Set(
+  (truncatedDigests as Array<{ country: string; date: string }>).map(
+    (d) => `${d.country}|${d.date}`
+  )
+)
+
+// These digests' narrative got cut off mid-sentence by a generation-time fault
+// (see website/data/truncated-digests.json). We keep them in the archive as
+// published rather than deleting them, but they shouldn't rank in search.
+export function isTruncatedDigest(country: string, date: string): boolean {
+  return TRUNCATED_DIGESTS.has(`${country}|${date}`)
+}
+
+const EDITORS_NOTE =
+  "*Editor's note: this digest was cut short by a technical fault at the time of publication. We have kept it in the archive as published.*"
+
+function appendEditorsNote(rawContent: string): string {
+  const match = rawContent.match(/\n(?:---\n)?## Related Coverage/)
+  if (!match || match.index === undefined) return rawContent
+  return rawContent.slice(0, match.index) + `\n\n${EDITORS_NOTE}` + rawContent.slice(match.index)
+}
 
 const REPO = '24econews/argentina'
 export const API_BASE = `https://api.github.com/repos/${REPO}/contents`
@@ -118,9 +141,10 @@ export async function getDigest(
   const articles = parseArticles(displayContent)
   // TITLE is stripped separately (with a blank-line lookahead) since its value can
   // wrap onto a following line; the other metadata fields are always single-line.
-  const rawContent = displayContent
+  let rawContent = displayContent
     .replace(/^(?:> )?TITLE:\s*[\s\S]+?(?=\n\s*\n)/m, '')
     .replace(/^(?:> )?(?:IMAGE_URL|IMAGE_THUMB|IMAGE_CREDIT|IMAGE_CREDIT_URL):.*\n?/gm, '')
+  if (isTruncatedDigest(country, date)) rawContent = appendEditorsNote(rawContent)
   console.log(`[getDigest] ${country}/${date} title="${meta.title}"`)
   return { ...meta, articles, rawContent }
 }

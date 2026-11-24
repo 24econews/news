@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getActiveCountries } from '@/lib/countries'
-import { getCountryDigests } from '@/lib/digests'
+import { getCountryDigests, isTruncatedDigest } from '@/lib/digests'
 import { getAllOpeds } from '@/lib/oped'
 import { buildDigestUrl, buildOpinionUrl } from '@/lib/slugify'
 
@@ -27,12 +27,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await Promise.all(
       countries.map(async (c) => {
         const digests = await getCountryDigests(c.slug)
-        return digests.map((d) => ({
-          url: `${BASE}${buildDigestUrl(c.slug, d.date, d.title)}`,
-          lastModified: new Date(d.date),
-          changeFrequency: 'daily' as const,
-          priority: 0.8,
-        }))
+        return digests
+          .filter((d) => !isTruncatedDigest(c.slug, d.date))
+          .map((d) => ({
+            url: `${BASE}${buildDigestUrl(c.slug, d.date, d.title)}`,
+            lastModified: new Date(d.date),
+            changeFrequency: 'daily' as const,
+            priority: 0.8,
+          }))
       })
     )
   ).flat()

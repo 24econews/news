@@ -14,20 +14,25 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ country: string }>
+  searchParams: Promise<{ page?: string }>
 }): Promise<Metadata> {
   const { country: countrySlug } = await params
+  const { page = '1' } = await searchParams
   const countryInfo = getCountry(countrySlug)
   if (!countryInfo || !countryInfo.active) return {}
 
   const title = `${countryInfo.name} Economic Digest | 24EcoNews`
   const description = `Daily economic digest coverage of ${countryInfo.name}: inflation, currency, trade, and policy news, drawn from ${countryInfo.sources.join(', ')}.`
+  const pageNum = Math.max(1, parseInt(page) || 1)
 
   return {
     title,
     description,
     alternates: { canonical: `${BASE}/${countrySlug}` },
+    ...(pageNum > 1 ? { robots: { index: false, follow: true } } : {}),
   }
 }
 

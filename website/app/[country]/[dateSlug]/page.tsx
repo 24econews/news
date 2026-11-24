@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getCountry, getActiveCountries } from '@/lib/countries'
-import { getDigest, getCountryDigests, extractTeaser } from '@/lib/digests'
+import { getDigest, getCountryDigests, extractTeaser, isTruncatedDigest } from '@/lib/digests'
 import { buildDigestUrl } from '@/lib/slugify'
 import DigestViewer from '@/components/DigestViewer'
 
@@ -49,6 +49,7 @@ export async function generateMetadata({
     title: `${title} | 24EcoNews`,
     description,
     alternates: { canonical: url },
+    ...(isTruncatedDigest(country, date) ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title,
       description,

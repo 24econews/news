@@ -179,23 +179,40 @@ function RelatedOpinion({ opinion }: { opinion: RelatedOpinionLink | null }) {
   )
 }
 
+// Written by getDigest() for digests whose generation was cut short (see
+// website/data/truncated-digests.json) — unlike the byline italics this
+// pattern also matches (e.g. "*AI-generated analysis | date*"), this one must
+// survive the byline filter below and render visibly, in italics.
+const EDITORS_NOTE_RE = /^\*(Editor's note:.+)\*$/
+
 function NarrativeContent({ rawContent }: { rawContent: string }) {
   const { mainContent, coverageItems, opinion } = parseDigestSections(rawContent)
 
   const paragraphs = mainContent
     .split('\n\n')
     .map((p) => p.trim())
-    .filter((p) => p && !p.startsWith('#') && !p.startsWith('>') && !/^\*[^*]+\*$/.test(p))
+    .filter((p) => p && !p.startsWith('#') && !p.startsWith('>'))
+    .filter((p) => EDITORS_NOTE_RE.test(p) || !/^\*[^*]+\*$/.test(p))
 
   return (
     <>
       <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
         <div className="prose prose-slate max-w-none">
-          {paragraphs.map((p, i) => (
-            <p key={i} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
-              {p}
-            </p>
-          ))}
+          {paragraphs.map((p, i) => {
+            const editorsNote = p.match(EDITORS_NOTE_RE)
+            if (editorsNote) {
+              return (
+                <p key={i} className="text-slate-500 italic text-sm leading-relaxed mb-4 last:mb-0">
+                  {editorsNote[1]}
+                </p>
+              )
+            }
+            return (
+              <p key={i} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
+                {p}
+              </p>
+            )
+          })}
         </div>
       </div>
       <RelatedCoverage items={coverageItems} />

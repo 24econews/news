@@ -8,10 +8,20 @@ const PAGE_SIZE = 50
 
 const BASE = 'https://www.24econews.com'
 
-export const metadata: Metadata = {
-  title: 'Archive | 24EcoNews',
-  description: 'Every daily economic digest published by 24EcoNews, across all countries.',
-  alternates: { canonical: `${BASE}/archive` },
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}): Promise<Metadata> {
+  const { page = '1' } = await searchParams
+  const pageNum = Math.max(1, parseInt(page) || 1)
+
+  return {
+    title: 'Archive | 24EcoNews',
+    description: 'Every daily economic digest published by 24EcoNews, across all countries.',
+    alternates: { canonical: `${BASE}/archive` },
+    ...(pageNum > 1 ? { robots: { index: false, follow: true } } : {}),
+  }
 }
 
 export default async function ArchivePage({
