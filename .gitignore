@@ -8,3 +8,4 @@ get-pip.py
 .vercel/
 __pycache__/
 *.pyc
+.env.save
