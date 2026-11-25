@@ -12,6 +12,7 @@ import yaml
 logger = logging.getLogger(__name__)
 
 MAX_ARTICLE_AGE_HOURS = 96  # covers a Monday run reaching back to Friday
+USER_AGENT = "24EcoNewsBot/1.0 (+https://www.24econews.com/contact)"
 
 
 @dataclass
@@ -49,7 +50,7 @@ def fetch_feed(feed_config: dict) -> List[Article]:
     dropped_stale = 0
     no_date = 0
     try:
-        feed = feedparser.parse(url)
+        feed = feedparser.parse(url, request_headers={"User-Agent": USER_AGENT})
         if feed.bozo:
             logger.warning(f"{name}: feed parse warning — {feed.bozo_exception}")
 

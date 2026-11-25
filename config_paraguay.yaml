@@ -9,17 +9,18 @@ digest:
   db_path: economy_paraguay.db
 
 rss_feeds:
-  # Direct feed
+  # Hoy's direct RSS feed is frozen (items stuck at Dec 2023 — feed generator
+  # appears abandoned); using a Google News search instead.
   - name: Hoy
-    url: https://www.hoy.com.py/rss/
+    url: https://news.google.com/rss/search?q=economia+site:hoy.com.py+when:2d&hl=es-419&gl=PY&ceid=PY:es-419
 
   # ABC Color, La Nación PY and Última Hora don't expose working RSS directly;
   # using Google News site: search to aggregate their economic coverage
   - name: ABC Color
-    url: https://news.google.com/rss/search?q=economia+site:abc.com.py&hl=es-419&gl=PY&ceid=PY:es-419
+    url: https://news.google.com/rss/search?q=economia+site:abc.com.py+when:2d&hl=es-419&gl=PY&ceid=PY:es-419
 
   - name: La Nación Paraguay
-    url: https://news.google.com/rss/search?q=economia+site:lanacion.com.py&hl=es-419&gl=PY&ceid=PY:es-419
+    url: https://news.google.com/rss/search?q=economia+site:lanacion.com.py+when:2d&hl=es-419&gl=PY&ceid=PY:es-419
 
   - name: Última Hora
-    url: https://news.google.com/rss/search?q=economia+site:ultimahora.com&hl=es-419&gl=PY&ceid=PY:es-419
+    url: https://news.google.com/rss/search?q=economia+site:ultimahora.com+when:2d&hl=es-419&gl=PY&ceid=PY:es-419

@@ -9,17 +9,24 @@ digest:
   db_path: economy_uruguay.db
 
 rss_feeds:
-  # Direct feeds
+  # El País (Uruguay)'s direct RSS blocks Python's urllib at the client/TLS level
+  # (403 even with an honest bot User-Agent, while curl with the same UA succeeds)
+  # and returns 0 items in production; using a Google News search instead.
   - name: El País Uruguay
-    url: https://www.elpais.com.uy/rss/
+    url: https://news.google.com/rss/search?q=economia+site:elpais.com.uy+when:2d&hl=es-419&gl=UY&ceid=UY:es-419
 
   # El Observador and La Diaria don't expose RSS directly;
   # using Google News search to aggregate their economic coverage
   - name: El Observador
-    url: https://news.google.com/rss/search?q=economia+site:elobservador.com.uy&hl=es-419&gl=UY&ceid=UY:es-419
+    url: https://news.google.com/rss/search?q=economia+site:elobservador.com.uy+when:2d&hl=es-419&gl=UY&ceid=UY:es-419
 
   - name: La Diaria
-    url: https://news.google.com/rss/search?q=site:ladiaria.com.uy+finanzas+economia&hl=es-419&gl=UY&ceid=UY:es-419
+    url: https://news.google.com/rss/search?q=site:ladiaria.com.uy+finanzas+economia+when:2d&hl=es-419&gl=UY&ceid=UY:es-419
 
   - name: Uruguay Economía
-    url: https://news.google.com/rss/search?q=economia+uruguay&hl=es-419&gl=UY&ceid=UY:es-419
+    url: https://news.google.com/rss/search?q=economia+uruguay+when:2d&hl=es-419&gl=UY&ceid=UY:es-419
+
+  # Montevideo Portal has no direct RSS; Google News search works well (all
+  # results within 96h, no tag/category-page noise)
+  - name: Montevideo Portal
+    url: https://news.google.com/rss/search?q=economia+site:montevideo.com.uy+when:2d&hl=es-419&gl=UY&ceid=UY:es-419
