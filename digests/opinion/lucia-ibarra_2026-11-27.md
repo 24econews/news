@@ -1,0 +1,30 @@
+> PERSONA: Lucía Ibarra
+> LENS: Regional sovereigntist
+> TITLE: Paraguay's Banking Collapse Sabotages Its Itaipú Renegotiation Leverage With Brazil
+> DATE: 2026-11-27
+
+The collapse of Ueno Bank in Paraguay has generated some editorial attention this week, but its deepest geopolitical implication has gone largely unremarked: this is not simply a story of private banking fraud. It is a story about what happens when a small, landlocked nation's most critical strategic asset — the binational hydroelectric facility that underpins its entire fiscal architecture — becomes hostage to a domestic financial scandal, and must negotiate its own sovereignty from a position of institutional weakness.
+
+That is the story worth telling.
+
+---
+
+When Itaipú Binacional, the world's largest hydroelectric generator by output, deposited funds in a recently established Paraguayan bank with governance deficiencies and an asset concentration that any competent supervisor should have flagged within months, it did not merely commit a financial error. It handed Brazil — Paraguay's co-sovereign in the binational enterprise and its counterpart in Annex C renegotiations — a negotiating advantage that Brasília did not need to manufacture. Paraguay's Foreign Minister this week pledged restitution of roughly USD 220 million in frozen Itaipú funds to his Brazilian counterpart without disclosing any mechanism or timeline. That is not a diplomatic conversation between equals. That is a debtor explaining himself.
+
+The renegotiation of Annex C — the financial annex governing how the energy surplus Paraguay sells to Brazil is priced — is precisely the terrain on which Asunción has the most to gain and the most to lose in the coming decade. ANDE, Paraguay's national electricity utility, is projected to absorb losses of USD 389 million in 2026 alone under the current tariff structure. The country generates far more power than it can consume domestically and is constitutionally obligated to sell its surplus exclusively to Brazil, at rates that have historically undervalued Paraguayan energy sovereignty. The renegotiation of those terms is therefore not a technical matter. It is the central mechanism by which Paraguay can recapture the developmental dividend of its natural endowment. And the government of Santiago Peña has just walked into that negotiation with a former Economy Minister under arrest, USD 220 million of binational funds frozen, and the new Itaipú Director General — appointed amid the scandal — already facing questions about his own prior relationship with the failed bank.
+
+This is the precise dynamic that regional sovereigntists have warned about for decades: not foreign invasion, but domestic institutional fragility conscripted into service as external leverage. The IMF did not cause this crisis. Washington did not engineer it. But the effect is structurally identical to what external conditionality historically produces — a weakened sovereign at the negotiating table, forced to offer assurances rather than demand rights. Paraguay is now in that position with Brazil, and the timing could not be worse.
+
+It would be intellectually dishonest to pretend that the responsibility here lies with Brasília or with any external actor. The Ueno Bank collapse is a Paraguayan institutional failure. The supervisory gaps at the Banco Central del Paraguay, the governance opacities at the Itaipú Paraguayan directorship, the contracts awarded to Vázquez group companies despite explicit internal rules prohibiting them — these are products of a political economy in which the boundary between public resources and private capture has remained dangerously porous. The underground economy reached 47.1% of GDP, according to figures cited in Asunción this week. That is not a figure imposed from outside. And the arrest of a sitting former Economy Minister is not a foreign conspiracy: it is the consequence of choices made within Paraguay's own institutions.
+
+But acknowledging internal failure does not absolve the structural asymmetry. Paraguay has been chronically underpaid for Itaipú's energy for decades, and the renegotiation of Annex C represents a genuinely historic opportunity to correct that. The country's macroeconomic fundamentals are, as the IMF itself noted in its current review, among the region's strongest: GDP growth near 4.5% for 2026, a broad external financing base, and an energy endowment whose value is rising as the region decarbonizes. What Paraguay lacks is not productive capacity. What it lacks, at this precise moment, is the institutional credibility to press its legitimate claims with confidence.
+
+The 2027 budget approved this week — which the Foro Multisectorial has already labeled fiscal irresponsibility and which restores executive compensation while cutting Hambre Cero by USD 130 million — only deepens the credibility problem. Investors are watching. Regional partners are watching. And Brazil, sitting across the Itaipú table, is watching most carefully of all.
+
+Regional integration, to be meaningful rather than merely rhetorical, requires that its members be strong enough to negotiate as sovereigns. Paraguay's geopolitical position within Mercosur has always rested on Itaipú as its principal source of leverage — the one asset large enough to command attention from Brasília. The Ueno crisis has not eliminated that leverage, but it has compromised Paraguay's ability to exercise it at the moment it matters most. Rebuilding that capacity — through genuine supervisory reform, through transparency in public-private boundaries, through a budgetary framework that earns rather than demands credibility — is not a capitulation to market orthodoxy. It is the precondition for the kind of regional sovereignty that Asunción claims to want.
+
+The energy of the Paraná River belongs to Paraguay. But the ability to negotiate its value depends entirely on the strength of the institutions standing behind the negotiator.
+
+---
+
+*Lucía Ibarra is one of 24EcoNews's eight recurring opinion columnists, each representing a distinct editorial perspective on Mercosur affairs.*
