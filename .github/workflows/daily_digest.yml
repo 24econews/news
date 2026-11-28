@@ -17,6 +17,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
 
+      - name: Capture run date
+        run: echo "RUN_DATE=$(date -u +%F)" >> $GITHUB_ENV
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -190,4 +193,4 @@ jobs:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: |
-          python publishing/oped_bluesky_poster.py
+          python publishing/oped_bluesky_poster.py --date "$RUN_DATE"
